@@ -32,7 +32,7 @@ DATABASE_URI = os.getenv(
 
 
 ######################################################################
-#  Product   M O D E L   T E S T   C A S E S
+#  PRODUCT   M O D E L   T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
 class TestProduct(TestCase):
