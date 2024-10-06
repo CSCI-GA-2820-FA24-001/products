@@ -15,20 +15,23 @@
 ######################################################################
 
 """
-TestYourResourceModel API Service Test Suite
+TestProduct API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
 import os
 import logging
 from unittest import TestCase
+from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import db, YourResourceModel
+from service.models import db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+
+BASE_URL = "/products"
 
 
 ######################################################################
@@ -56,7 +59,7 @@ class TestYourResourceService(TestCase):
     def setUp(self):
         """Runs before each test"""
         self.client = app.test_client()
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(Product).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -73,3 +76,30 @@ class TestYourResourceService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     # Todo: Add your test cases here...
+    
+    # def test_create_product(self):
+    #     """It should Create a new Product"""
+    #     test_product = ProductFactory()
+    #     logging.debug("Test Product: %s", test_product.serialize())
+    #     response = self.client.post(BASE_URL, json=test_product.serialize())
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    #     # Make sure location header is set
+    #     location = response.headers.get("Location", None)
+    #     self.assertIsNotNone(location)
+
+    #     # Check the data is correct
+    #     new_product = response.get_json()
+    #     self.assertEqual(new_product["name"], test_product.name)
+    #     self.assertEqual(new_product["category"], test_product.category)
+    #     self.assertEqual(new_product["available"], test_product.available)
+    #     self.assertEqual(new_product["gender"], test_product.gender.name)
+
+    #     # Check that the location header was correct
+    #     response = self.client.get(location)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     new_product = response.get_json()
+    #     self.assertEqual(new_product["name"], test_product.name)
+    #     self.assertEqual(new_product["category"], test_product.category)
+    #     self.assertEqual(new_product["available"], test_product.available)
+    #     self.assertEqual(new_product["gender"], test_product.gender.name)

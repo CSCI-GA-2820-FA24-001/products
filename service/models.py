@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Product
 
 All of the models are stored in this module
 """
@@ -17,22 +17,24 @@ class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
 
-class YourResourceModel(db.Model):
+class Product(db.Model):
     """
-    Class that represents a YourResourceModel
+    Class that represents a Product
     """
 
     ##################################################
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
+    imageUrl = db.Column(db.String(255), nullable=False)
 
     # Todo: Place the rest of your schema here...
 
     def __repr__(self):
-        return f"<YourResourceModel {self.name} id=[{self.id}]>"
-
+        return f"<Product {self.name} id=[{self.id}]>"
     def create(self):
         """
         Creates a YourResourceModel to the database
@@ -69,31 +71,39 @@ class YourResourceModel(db.Model):
             db.session.rollback()
             logger.error("Error deleting record: %s", self)
             raise DataValidationError(e) from e
-
+        
     def serialize(self):
-        """Serializes a YourResourceModel into a dictionary"""
-        return {"id": self.id, "name": self.name}
+        """Serializes a Product into a dictionary"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "price": self.price,
+            "imageUrl": self.imageUrl,
+        }
 
     def deserialize(self, data):
         """
-        Deserializes a YourResourceModel from a dictionary
+        Deserializes a Product from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
         """
         try:
             self.name = data["name"]
+            self.description = data["description"]
+            self.price = data["price"]
+            self.imageUrl=data["imageUrl"]
         except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
+            raise DataValidationError("Invalid attribute: " +
+                                      error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError(
-                "Invalid YourResourceModel: missing " + error.args[0]
-            ) from error
+            raise DataValidationError("Invalid Product: missing " +
+                                      error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid YourResourceModel: body of request contained bad or no data "
-                + str(error)
-            ) from error
+                "Invalid Product: body of request contained bad or no data " +
+                str(error)) from error
         return self
 
     ##################################################
@@ -102,22 +112,22 @@ class YourResourceModel(db.Model):
 
     @classmethod
     def all(cls):
-        """Returns all of the YourResourceModels in the database"""
-        logger.info("Processing all YourResourceModels")
+        """Returns all of the Products in the database"""
+        logger.info("Processing all Products")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """Finds a YourResourceModel by it's ID"""
+        """Finds a Product by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.session.get(cls, by_id)
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
+        """Returns all Products with the given name
 
         Args:
-            name (string): the name of the YourResourceModels you want to match
+            name (string): the name of the Products you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
