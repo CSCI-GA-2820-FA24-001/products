@@ -76,30 +76,3 @@ class TestYourResourceService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     # Todo: Add your test cases here...
-    
-    # def test_create_product(self):
-    #     """It should Create a new Product"""
-    #     test_product = ProductFactory()
-    #     logging.debug("Test Product: %s", test_product.serialize())
-    #     response = self.client.post(BASE_URL, json=test_product.serialize())
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    #     # Make sure location header is set
-    #     location = response.headers.get("Location", None)
-    #     self.assertIsNotNone(location)
-
-    #     # Check the data is correct
-    #     new_product = response.get_json()
-    #     self.assertEqual(new_product["name"], test_product.name)
-    #     self.assertEqual(new_product["category"], test_product.category)
-    #     self.assertEqual(new_product["available"], test_product.available)
-    #     self.assertEqual(new_product["gender"], test_product.gender.name)
-
-    #     # Check that the location header was correct
-    #     response = self.client.get(location)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     new_product = response.get_json()
-    #     self.assertEqual(new_product["name"], test_product.name)
-    #     self.assertEqual(new_product["category"], test_product.category)
-    #     self.assertEqual(new_product["available"], test_product.available)
-    #     self.assertEqual(new_product["gender"], test_product.gender.name)
