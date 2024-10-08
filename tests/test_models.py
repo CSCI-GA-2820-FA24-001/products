@@ -22,6 +22,7 @@ Test cases for Product Model
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
 from service.models import Product, DataValidationError, db
 from .factories import ProductFactory
@@ -86,7 +87,7 @@ class TestProduct(TestCase):
         product.create()
         logging.debug(product)
         self.assertIsNotNone(product.id)
-        # Change it an save it
+        # Change it and save it
         product.name = "new_name"
         original_id = product.id
         product.update()
@@ -104,4 +105,18 @@ class TestProduct(TestCase):
         product = ProductFactory()
         logging.debug(product)
         product.id = None
+        self.assertRaises(DataValidationError, product.update)
+
+
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCase):
+    """Product Model Exception Handlers"""
+
+    @patch("service.models.db.session.commit")
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
+        exception_mock.side_effect = Exception()
+        product = ProductFactory()
         self.assertRaises(DataValidationError, product.update)

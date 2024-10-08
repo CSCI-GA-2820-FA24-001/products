@@ -35,6 +35,7 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
+
     def create(self):
         """
         Creates a YourResourceModel to the database
@@ -51,9 +52,11 @@ class Product(db.Model):
 
     def update(self):
         """
-        Updates a YourResourceModel to the database
+        Updates a Product to the database
         """
         logger.info("Saving %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         try:
             db.session.commit()
         except Exception as e:
@@ -71,7 +74,7 @@ class Product(db.Model):
             db.session.rollback()
             logger.error("Error deleting record: %s", self)
             raise DataValidationError(e) from e
-        
+
     def serialize(self):
         """Serializes a Product into a dictionary"""
         return {
@@ -93,17 +96,18 @@ class Product(db.Model):
             self.name = data["name"]
             self.description = data["description"]
             self.price = data["price"]
-            self.imageUrl=data["imageUrl"]
+            self.imageUrl = data["imageUrl"]
         except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " +
-                                      error.args[0]) from error
+            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError("Invalid Product: missing " +
-                                      error.args[0]) from error
+            raise DataValidationError(
+                "Invalid Product: missing " + error.args[0]
+            ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Product: body of request contained bad or no data " +
-                str(error)) from error
+                "Invalid Product: body of request contained bad or no data "
+                + str(error)
+            ) from error
         return self
 
     ##################################################
