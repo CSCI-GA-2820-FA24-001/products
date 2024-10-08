@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-Test cases for Pet Model
+Test cases for Product Model
 """
 
 # pylint: disable=duplicate-code
@@ -77,3 +77,31 @@ class TestProduct(TestCase):
         self.assertEqual(data.description, product.description)
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
+
+    def test_update_a_pet(self):
+        """It should Update a Product"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        product.create()
+        logging.debug(product)
+        self.assertIsNotNone(product.id)
+        # Change it an save it
+        product.name = "new_name"
+        original_id = product.id
+        product.update()
+        self.assertEqual(product.id, original_id)
+        self.assertEqual(product.name, "new_name")
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].id, original_id)
+        self.assertEqual(products[0].name, "new_name")
+
+    def test_update_no_id(self):
+        """It should not Update a Product with no id"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
