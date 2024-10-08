@@ -15,20 +15,23 @@
 ######################################################################
 
 """
-TestYourResourceModel API Service Test Suite
+TestProduct API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
 import os
 import logging
 from unittest import TestCase
+from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import db, YourResourceModel
+from service.models import db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+
+BASE_URL = "/products"
 
 
 ######################################################################
@@ -56,7 +59,7 @@ class TestYourResourceService(TestCase):
     def setUp(self):
         """Runs before each test"""
         self.client = app.test_client()
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(Product).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
