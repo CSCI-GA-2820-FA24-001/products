@@ -35,9 +35,10 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
+
     def create(self):
         """
-        Creates a YourResourceModel to the database
+        Creates a ProductModel to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # pylint: disable=invalid-name
@@ -51,7 +52,7 @@ class Product(db.Model):
 
     def update(self):
         """
-        Updates a YourResourceModel to the database
+        Updates a ProductModel to the database
         """
         logger.info("Saving %s", self.name)
         try:
@@ -62,7 +63,7 @@ class Product(db.Model):
             raise DataValidationError(e) from e
 
     def delete(self):
-        """Removes a YourResourceModel from the data store"""
+        """Removes a ProductModel from the data store"""
         logger.info("Deleting %s", self.name)
         try:
             db.session.delete(self)
@@ -71,7 +72,7 @@ class Product(db.Model):
             db.session.rollback()
             logger.error("Error deleting record: %s", self)
             raise DataValidationError(e) from e
-        
+
     def serialize(self):
         """Serializes a Product into a dictionary"""
         return {
@@ -92,18 +93,22 @@ class Product(db.Model):
         try:
             self.name = data["name"]
             self.description = data["description"]
-            self.price = data["price"]
-            self.imageUrl=data["imageUrl"]
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " +
-                                      error.args[0]) from error
+            price = data["price"]
+            if not isinstance(price, float):
+                raise DataValidationError("Invalid type for price: must be a float")
+            self.price = price
+            self.imageUrl = data["imageUrl"]
+        # except AttributeError as error:
+        #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError("Invalid Product: missing " +
-                                      error.args[0]) from error
+            raise DataValidationError(
+                "Invalid Product: missing " + error.args[0]
+            ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Product: body of request contained bad or no data " +
-                str(error)) from error
+                "Invalid Product: body of request contained bad or no data "
+                + str(error)
+            ) from error
         return self
 
     ##################################################

@@ -22,6 +22,7 @@ Test cases for Pet Model
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
 from service.models import Product, DataValidationError, db
 from .factories import ProductFactory
@@ -35,7 +36,7 @@ DATABASE_URI = os.getenv(
 #  PRODUCT   M O D E L   T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestProduct(TestCase):
+class TestCaseBase(TestCase):
     """Test Cases for Product Model"""
 
     @classmethod
@@ -62,11 +63,27 @@ class TestProduct(TestCase):
         db.session.remove()
 
     ######################################################################
-    #  T E S T   C A S E S
+    #  T E S T   C A S E S   FOR   CRUD
     ######################################################################
 
-    def test_create_product(self):
-        """It should create a Product"""
+    def test_create_a_product(self):
+        """It should create a new product"""
+        product = Product(
+            name="book", description="It's a book", price=15.2, imageUrl="www.test.com"
+        )
+        self.assertEqual(str(product), "<Product book id=[None]>")
+        self.assertTrue(product is not None)
+        self.assertEqual(product.id, None)
+        self.assertEqual(product.name, "book")
+        self.assertEqual(product.description, "It's a book")
+        self.assertTrue(isinstance(product.price, float), True)
+        self.assertEqual(str(product.price), "15.2")
+        self.assertEqual(product.imageUrl, "www.test.com")
+
+    def test_create_and_add_a_product(self):
+        """It should create a product and add it into db"""
+        products = Product.all()
+        self.assertEqual(products, [])
         product = ProductFactory()
         product.create()
         self.assertIsNotNone(product.id)
@@ -77,3 +94,77 @@ class TestProduct(TestCase):
         self.assertEqual(data.description, product.description)
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
+
+    # TODO
+
+    ######################################################################
+    #  T E S T   C A S E S   FOR   SERIALIZE/DESERIALIZE
+    ######################################################################
+    def test_serialize_a_product(self):
+        """It should serialize a product"""
+        product = ProductFactory()
+        data = product.serialize()
+        self.assertNotEqual(data, None)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], product.id)
+        self.assertIn("name", data)
+        self.assertEqual(data["name"], product.name)
+        self.assertIn("description", data)
+        self.assertEqual(data["description"], product.description)
+        self.assertIn("price", data)
+        self.assertEqual(data["price"], product.price)
+        self.assertIn("imageUrl", data)
+        self.assertEqual(data["imageUrl"], product.imageUrl)
+
+    def test_deserialize_a_product(self):
+        """It should de-serialize a Product"""
+        data = {
+            "name": "Sample Product",
+            "description": "A sample description",
+            "price": 19.99,
+            "imageUrl": "http://example.com/image.png",
+        }
+        product = Product()  # Assuming 'Product' is the new class name instead of 'Pet'
+        product.deserialize(data)
+        self.assertIsNotNone(product)
+        self.assertEqual(product.name, data["name"])
+        self.assertEqual(product.description, data["description"])
+        self.assertEqual(product.price, data["price"])
+        self.assertEqual(product.imageUrl, data["imageUrl"])
+
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a Product with missing data"""
+        data = {
+            "name": "Sample Product",
+            "price": 19.99,
+        }  # Missing description and imageUrl
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"  # Invalid data type
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_price(self):
+        """It should not deserialize a bad price attribute"""
+        test_product = ProductFactory()
+        data = test_product.serialize()
+        data["price"] = "19.99"  # Invalid price, should be a float
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCaseBase):
+    """Product Model Exception Handlers"""
+
+    @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        product = ProductFactory()
+        self.assertRaises(DataValidationError, product.create)
