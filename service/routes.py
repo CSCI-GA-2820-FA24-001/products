@@ -33,10 +33,21 @@ from service.common import status  # HTTP Status Codes
 @app.route("/")
 def index():
     """Root URL response"""
+    app.logger.info("Request for Root URL")
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Product REST API Service",
+            version="1.0",
+            path=url_for("list_products", _external=True),
+        ),
         status.HTTP_200_OK,
     )
+
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
 
 
 ######################################################################
@@ -74,6 +85,61 @@ def update_products(product_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+
+@app.route("/products", methods=["GET"])
+def list_products():
+    """Returns all of the Products"""
+    app.logger.info("Request for product list")
+
+    products = []
+
+    # parse the query request
+    name = request.args.get("name")
+
+    # TODO: support more query methods and test them
+
+    # price = request.args.get("price")
+    # img_url = request.args.get("imageUrl")
+
+    print(request.args)
+
+    if name:
+        app.logger.info(f"Finding by name: {name}")
+        products = Product.find_by_name(name)
+
+    results = [product.serialize() for product in products]
+    app.logger.info(f"Find {len(results)} products")
+    return jsonify(results), status.HTTP_200_OK
+
+
+@app.route("/products", methods=["POST"])
+def create_products():
+    """
+    Create a Product
+    This endpoint will create a Product based the data in the body that is posted
+    """
+    app.logger.info("Request to create a product")
+    check_content_type("application/json")
+
+    product = Product()
+
+    data = request.get_json()
+    app.logger.info(f"Deserializing data {data}")
+    product.deserialize(data)
+    product.create()
+    app.logger.info(f"Product {product.id}: {product.name} is saved!")
+
+    # TODO: uncomment this when read API is implemented!
+    # location_url = url_for("get_products", product_id=product.id, _external=True)
+
+    location_url = "JUST A TEST FOR CREATE!"
+
+    return (
+        jsonify(product.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
 
 
 ######################################################################

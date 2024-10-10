@@ -38,7 +38,7 @@ class Product(db.Model):
 
     def create(self):
         """
-        Creates a YourResourceModel to the database
+        Creates a ProductModel to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # pylint: disable=invalid-name
@@ -65,7 +65,7 @@ class Product(db.Model):
             raise DataValidationError(e) from e
 
     def delete(self):
-        """Removes a YourResourceModel from the data store"""
+        """Removes a ProductModel from the data store"""
         logger.info("Deleting %s", self.name)
         try:
             db.session.delete(self)
@@ -95,10 +95,13 @@ class Product(db.Model):
         try:
             self.name = data["name"]
             self.description = data["description"]
-            self.price = data["price"]
+            price = data["price"]
+            if not isinstance(price, float):
+                raise DataValidationError("Invalid type for price: must be a float")
+            self.price = price
             self.imageUrl = data["imageUrl"]
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
+        # except AttributeError as error:
+        #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Product: missing " + error.args[0]
