@@ -82,11 +82,6 @@ def update_products(product_id):
     return jsonify(product.serialize()), status.HTTP_200_OK
 
 
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-
 @app.route("/products", methods=["GET"])
 def list_products():
     """Returns all of the Products"""

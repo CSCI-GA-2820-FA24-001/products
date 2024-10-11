@@ -95,48 +95,6 @@ class TestCaseBase(TestCase):
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
 
-    def test_update_a_pet(self):
-        """It should Update a Product"""
-        product = ProductFactory()
-        logging.debug(product)
-        product.id = None
-        product.create()
-        logging.debug(product)
-        self.assertIsNotNone(product.id)
-        # Change it and save it
-        product.name = "new_name"
-        original_id = product.id
-        product.update()
-        self.assertEqual(product.id, original_id)
-        self.assertEqual(product.name, "new_name")
-        # Fetch it back and make sure the id hasn't changed
-        # but the data did change
-        products = Product.all()
-        self.assertEqual(len(products), 1)
-        self.assertEqual(products[0].id, original_id)
-        self.assertEqual(products[0].name, "new_name")
-
-    def test_update_no_id(self):
-        """It should not Update a Product with no id"""
-        product = ProductFactory()
-        logging.debug(product)
-        product.id = None
-        self.assertRaises(DataValidationError, product.update)
-
-
-######################################################################
-#  T E S T   E X C E P T I O N   H A N D L E R S
-######################################################################
-class TestExceptionHandlers(TestCase):
-    """Product Model Exception Handlers"""
-
-    @patch("service.models.db.session.commit")
-    def test_update_exception(self, exception_mock):
-        """It should catch a update exception"""
-        exception_mock.side_effect = Exception()
-        product = ProductFactory()
-        self.assertRaises(DataValidationError, product.update)
-
     # TODO
 
     ######################################################################
@@ -197,16 +155,48 @@ class TestExceptionHandlers(TestCase):
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 
+    ######################################################################
+    #  T E S T   C A S E S   FOR   UPDATE
+    ######################################################################
+
+    def test_update_a_pet(self):
+        """It should Update a Product"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        product.create()
+        logging.debug(product)
+        self.assertIsNotNone(product.id)
+        # Change it and save it
+        product.name = "new_name"
+        original_id = product.id
+        product.update()
+        self.assertEqual(product.id, original_id)
+        self.assertEqual(product.name, "new_name")
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].id, original_id)
+        self.assertEqual(products[0].name, "new_name")
+
+    def test_update_no_id(self):
+        """It should not Update a Product with no id"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
+
 
 ######################################################################
 #  T E S T   E X C E P T I O N   H A N D L E R S
 ######################################################################
-class TestExceptionHandlers(TestCaseBase):
+class TestExceptionHandlers(TestCase):
     """Product Model Exception Handlers"""
 
     @patch("service.models.db.session.commit")
-    def test_create_exception(self, exception_mock):
-        """It should catch a create exception"""
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
         exception_mock.side_effect = Exception()
         product = ProductFactory()
-        self.assertRaises(DataValidationError, product.create)
+        self.assertRaises(DataValidationError, product.update)

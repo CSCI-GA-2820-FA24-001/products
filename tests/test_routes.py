@@ -105,25 +105,6 @@ class TestProductService(TestCase):
         self.assertEqual(data["message"], "Healthy")
 
     # ----------------------------------------------------------
-    # TEST UPDATE
-    # ----------------------------------------------------------
-    def test_update_product(self):
-        """It should Update an existing Product"""
-        # create a product to update
-        test_product = ProductFactory()
-        response = self.client.post(BASE_URL, json=test_product.serialize())
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # update the product
-        new_product = response.get_json()
-        logging.debug(new_product)
-        new_product["name"] = "new_name"
-        response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_product = response.get_json()
-        self.assertEqual(updated_product["name"], "new_name")
-
-    # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------
     def test_get_product_list(self):
@@ -163,6 +144,25 @@ class TestProductService(TestCase):
         self.assertEqual(new_product["description"], test_product.description)
         self.assertEqual(new_product["price"], str(round(test_product.price, 2)))
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+    def test_update_product(self):
+        """It should Update an existing Product"""
+        # create a product to update
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the product
+        new_product = response.get_json()
+        logging.debug(new_product)
+        new_product["name"] = "new_name"
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["name"], "new_name")
 
 
 ######################################################################
