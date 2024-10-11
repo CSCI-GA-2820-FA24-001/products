@@ -31,6 +31,11 @@ class Product(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     imageUrl = db.Column(db.String(255), nullable=False)
 
+    # #maybe we need this attribute?
+    # in_stock = db.Column(
+    #     db.Boolean(), nullable=False, default=False
+    # )
+
     # Todo: Place the rest of your schema here...
 
     def __repr__(self):
@@ -122,10 +127,14 @@ class Product(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
-        """Finds a Product by it's ID"""
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.session.get(cls, by_id)
+    def find_by_id(cls, product_id):
+        """Returns the Product with the given id
+
+        Args:
+            product_id (int): the id of the Product you want to retrieve
+        """
+        logger.info("Processing ID look up for id %s ...", product_id)
+        return cls.query.get(product_id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -136,3 +145,49 @@ class Product(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_description(cls, description):
+        """Returns all Products with the given description
+
+        Args:
+            description (string): the description of the Products you want to match
+        """
+        logger.info("Processing description query for %s ...", description)
+        return cls.query.filter(cls.description == description).all()
+
+    @classmethod
+    def find_by_price(cls, price):
+        """Returns all Products with the given price
+
+        Args:
+            price (float): the price of the Products you want to match
+        """
+        logger.info("Processing price query for %s ...", price)
+        return cls.query.filter(cls.price == price).all()
+
+    @classmethod
+    def find_by_imageUrl(cls, imageUrl):
+        """Returns all Products with the given imageUrl
+
+        Args:
+            imageUrl (string): the image URL of the Products you want to match
+        """
+        logger.info("Processing imageUrl query for %s ...", imageUrl)
+        return cls.query.filter(cls.imageUrl == imageUrl).all()
+
+    # @classmethod
+    # def find_by_in_stock(cls, in_stock: bool = True) -> list:
+    #     """Returns all Products by their stock status
+
+    #     :param in_stock: True for products that are in stock
+    #     :type in_stock: bool
+
+    #     :return: a collection of Products that are in stock
+    #     :rtype: list
+
+    #     """
+    #     if not isinstance(in_stock, bool):
+    #         raise TypeError("Invalid stock status, must be of type boolean")
+    #     logger.info("Processing stock query for %s ...", in_stock)
+    #     return cls.query.filter(cls.in_stock == in_stock)

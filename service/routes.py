@@ -55,30 +55,9 @@ def health_check():
 ######################################################################
 
 
-@app.route("/products", methods=["GET"])
-def list_products():
-    """Returns all of the Products"""
-    app.logger.info("Request for product list")
-
-    products = []
-
-    # parse the query request
-    name = request.args.get("name")
-
-    # TODO: support more query methods and test them
-
-    # price = request.args.get("price")
-    # img_url = request.args.get("imageUrl")
-
-    print(request.args)
-
-    if name:
-        app.logger.info(f"Finding by name: {name}")
-        products = Product.find_by_name(name)
-
-    results = [product.serialize() for product in products]
-    app.logger.info(f"Find {len(results)} products")
-    return jsonify(results), status.HTTP_200_OK
+######################################################################
+# CREATE A NEW PRODUCT
+######################################################################
 
 
 @app.route("/products", methods=["POST"])
@@ -108,6 +87,55 @@ def create_products():
         status.HTTP_201_CREATED,
         {"Location": location_url},
     )
+
+
+######################################################################
+# LIST ALL PRODUCTS
+######################################################################
+@app.route("/products", methods=["GET"])
+def list_products():
+    """Returns all of the Products"""
+    app.logger.info("Request for product list")
+
+    products = []
+
+    # Parse any arguments from the query string
+    name = request.args.get("name")
+    description = request.args.get("description")
+    price = request.args.get("price")
+    imageUrl = request.args.get("imageUrl")
+    product_id = request.args.get("id")
+
+    if product_id:
+        app.logger.info("Find by ID: %s", product_id)
+        products = [Product.find_by_id(product_id)]
+    elif name:
+        app.logger.info("Find by name: %s", name)
+        products = Product.find_by_name(name)
+    elif description:
+        app.logger.info("Find by description: %s", description)
+        products = Product.find_by_description(description)
+    elif price:
+        try:
+            app.logger.info("Find by price: %s", price)
+            products = Product.find_by_price(float(price))
+        except ValueError:
+            app.logger.error("Invalid price format: %s", price)
+            return (
+                jsonify({"error": "Invalid price format"}),
+                status.HTTP_400_BAD_REQUEST,
+            )
+    elif imageUrl:
+        app.logger.info("Find by imageUrl: %s", imageUrl)
+        products = Product.find_by_imageUrl(imageUrl)
+    else:
+        app.logger.info("Find all products")
+        products = Product.all()
+
+    # Serialize the results
+    results = [product.serialize() for product in products]
+    app.logger.info("Returning %d products", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
