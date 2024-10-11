@@ -145,6 +145,27 @@ class TestProductService(TestCase):
         self.assertEqual(new_product["price"], str(round(test_product.price, 2)))
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
 
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    def test_delete_product(self):
+        """It should Delete a Product"""
+        # Create a product to be deleted
+        test_product = self._create_products(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
+        # Make sure the product is deleted
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_non_existing_product(self):
+        """It should gracefully handle deleting a Product that doesn't exist"""
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S
