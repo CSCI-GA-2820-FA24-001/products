@@ -95,7 +95,32 @@ class TestCaseBase(TestCase):
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
 
-    # TODO
+    def test_list_all_products(self):
+        """It should List all products in the database"""
+        products = Product.all()
+        self.assertEqual(products, [])
+        # Create 5 Products
+        for _ in range(5):
+            product = ProductFactory()
+            product.create()
+        # See if we get back 5 products
+        products = Product.all()
+        self.assertEqual(len(products), 5)
+
+    def test_read_a_product(self):
+        """It should Read a Product"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Fetch it back
+        found_product = Product.find(product.id)
+        self.assertEqual(found_product.id, product.id)
+        self.assertEqual(found_product.name, product.name)
+        self.assertEqual(found_product.description, product.description)
+        self.assertEqual(found_product.price, product.price)
+        self.assertEqual(found_product.imageUrl, product.imageUrl)
 
     ######################################################################
     #  T E S T   C A S E S   FOR   SERIALIZE/DESERIALIZE
@@ -168,3 +193,89 @@ class TestExceptionHandlers(TestCaseBase):
         exception_mock.side_effect = Exception()
         product = ProductFactory()
         self.assertRaises(DataValidationError, product.create)
+
+
+# ######################################################################
+# #  Q U E R Y   T E S T   C A S E S
+# ######################################################################
+# class TestModelQueries(TestCaseBase):
+#     """Product Model Query Tests"""
+
+#     def test_find_product(self):
+#         """It should Find a Product by ID"""
+#         products = ProductFactory.create_batch(5)
+#         for product in products:
+#             product.create()
+#         logging.debug(products)
+#         # make sure they got saved
+#         self.assertEqual(len(Product.all()), 5)
+#         # find the 2nd product in the list
+#         product = Product.find(products[1].id)
+#         self.assertIsNot(product, None)
+#         self.assertEqual(product.id, products[1].id)
+#         self.assertEqual(product.name, products[1].name)
+#         self.assertEqual(product.description, products[1].description)
+#         self.assertEqual(product.price, products[1].price)
+#         self.assertEqual(product.imageUrl, products[1].imageUrl)
+
+#     def test_find_by_name(self):
+#         """It should Find a Product by Name"""
+#         products = ProductFactory.create_batch(10)
+#         for product in products:
+#             product.create()
+#         name = products[0].name
+#         count = len([product for product in products if product.name == name])
+#         found = Product.find_by_name(name)
+#         self.assertEqual(found.count(), count)
+#         for product in found:
+#             self.assertEqual(product.name, name)
+
+#     def test_find_by_description(self):
+#         """It should Find Products by Description"""
+#         products = ProductFactory.create_batch(10)
+#         for product in products:
+#             product.create()
+#         description = products[0].description
+#         count = len(
+#             [product for product in products if product.description == description]
+#         )
+#         found = Product.find_by_description(description)
+#         self.assertEqual(found.count(), count)
+#         for product in found:
+#             self.assertEqual(product.description, description)
+
+#     def test_find_by_price(self):
+#         """It should Find Products by Price"""
+#         products = ProductFactory.create_batch(10)
+#         for product in products:
+#             product.create()
+#         price = products[0].price
+#         count = len([product for product in products if product.price == price])
+#         found = Product.find_by_price(price)
+#         self.assertEqual(found.count(), count)
+#         for product in found:
+#             self.assertEqual(product.price, price)
+
+#     def test_find_by_imageUrl(self):
+#         """It should Find Products by Image URL"""
+#         products = ProductFactory.create_batch(10)
+#         for product in products:
+#             product.create()
+#         imageUrl = products[0].imageUrl
+#         count = len([product for product in products if product.imageUrl == imageUrl])
+#         found = Product.find_by_imageUrl(imageUrl)
+#         self.assertEqual(found.count(), count)
+#         for product in found:
+#             self.assertEqual(product.imageUrl, imageUrl)
+
+#     def test_find_by_in_stock(self):
+#         """It should Find Products by In Stock"""
+#         products = ProductFactory.create_batch(10)
+#         for product in products:
+#             product.create()
+#         in_stock = products[0].in_stock
+#         count = len([product for product in products if product.in_stock == in_stock])
+#         found = Product.find_by_in_stock(in_stock)
+#         self.assertEqual(found.count(), count)
+#         for product in found:
+#             self.assertEqual(product.in_stock, in_stock)
