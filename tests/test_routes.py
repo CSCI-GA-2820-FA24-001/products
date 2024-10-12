@@ -210,7 +210,10 @@ class TestProductService(TestCase):
         new_product = response.get_json()
         self.assertEqual(new_product["name"], test_product.name)
         self.assertEqual(new_product["description"], test_product.description)
-        self.assertEqual(new_product["price"], str(round(test_product.price, 2)))
+        self.assertEqual(
+            str(round(float(new_product["price"]), 2)),
+            str(round(test_product.price, 2)),
+        )
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
 
     # ----------------------------------------------------------
@@ -238,7 +241,7 @@ class TestProductService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "new_name")
-        
+
     # ----------------------------------------------------------
     # TEST DELETE
     # ----------------------------------------------------------
