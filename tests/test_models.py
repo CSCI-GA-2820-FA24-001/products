@@ -176,7 +176,7 @@ class TestCaseBase(TestCase):
         """It should not deserialize a bad price attribute"""
         test_product = ProductFactory()
         data = test_product.serialize()
-        data["price"] = "19.99"  # Invalid price, should be a float
+        data["price"] = "19.99!"  # Invalid price, should be a float
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 
