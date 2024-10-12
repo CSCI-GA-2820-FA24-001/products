@@ -95,6 +95,17 @@ class TestCaseBase(TestCase):
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
 
+    def test_delete_product(self):
+        """It should delete a Product"""
+        # Create a product using a factory or a similar method
+        product = ProductFactory()
+        product.create()
+        self.assertEqual(len(Product.all()), 1)
+
+        # Delete the product and make sure it isn't in the database
+        product.delete()
+        self.assertEqual(len(Product.all()), 0)
+
     def test_list_all_products(self):
         """It should List all products in the database"""
         products = Product.all()
@@ -194,6 +205,12 @@ class TestExceptionHandlers(TestCaseBase):
         product = ProductFactory()
         self.assertRaises(DataValidationError, product.create)
 
+    @patch("service.models.db.session.commit")
+    def test_delete_exception(self, exception_mock):
+        """It should catch a delete exception"""
+        exception_mock.side_effect = Exception()
+        product = ProductFactory()
+        self.assertRaises(DataValidationError, product.delete)
 
 # ######################################################################
 # #  Q U E R Y   T E S T   C A S E S

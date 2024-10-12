@@ -22,10 +22,11 @@ TestProduct API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import db, Product
+from service.models import DataValidationError, db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -212,9 +213,55 @@ class TestProductService(TestCase):
         self.assertEqual(new_product["price"], str(round(test_product.price, 2)))
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
 
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    def test_delete_product(self):
+        """It should Delete a Product"""
+        # Create a product to be deleted
+        test_product = self._create_products(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
+        # Make sure the product is deleted
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_non_existing_product(self):
+        """It should gracefully handle deleting a Product that doesn't exist"""
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S
 ######################################################################
 class TestSadPaths(TestCase):
     """Test REST Exception Handling"""
+
+    def setUp(self):
+        """Runs before each test"""
+        self.client = app.test_client()
+
+    ######################################################################
+    #  T E S T   M O C K S
+    ######################################################################
+    def test_unsupported_media_type(self):
+        """It should return 415 Unsupported Media Type"""
+        headers = {"Content-Type": "application/xml"}
+        response = self.client.post(
+            BASE_URL, data="<product></product>", headers=headers
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Unsupported media type")
+        self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    @patch("service.routes.Product.find_by_name")
+    def test_bad_request(self, bad_request_mock):
+        """It should return a Bad Request error from Find By Name"""
+        bad_request_mock.side_effect = DataValidationError()
+        response = self.client.get(BASE_URL, query_string="name=testproduct")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
