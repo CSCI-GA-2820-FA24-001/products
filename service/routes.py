@@ -94,48 +94,59 @@ def create_products():
 ######################################################################
 @app.route("/products", methods=["GET"])
 def list_products():
-    """Returns all of the Products"""
+    """Returns Products based on name and price"""
     app.logger.info("Request for product list")
 
-    products = []
-
-    # Parse any arguments from the query string
     name = request.args.get("name")
-    description = request.args.get("description")
     price = request.args.get("price")
-    imageUrl = request.args.get("imageUrl")
-    product_id = request.args.get("id")
 
-    if product_id:
-        app.logger.info("Find by ID: %s", product_id)
-        products = [Product.find_by_id(product_id)]
-    elif name:
-        app.logger.info("Find by name: %s", name)
-        products = Product.find_by_name(name)
-    elif description:
-        app.logger.info("Find by description: %s", description)
-        products = Product.find_by_description(description)
-    elif price:
+    query = Product.query
+
+    if name:
+        app.logger.info("Find by name (fuzzy match): %s", name)
+        query = query.filter(Product.name.like(f"%{name}%"))
+
+    if price:
         try:
-            app.logger.info("Find by price: %s", price)
-            products = Product.find_by_price(float(price))
+            app.logger.info("Find by price range: %s", price)
+            price_value = float(price)
+            query = query.filter(
+                Product.price.between(price_value - 5, price_value + 5)
+            )
         except ValueError:
             app.logger.error("Invalid price format: %s", price)
             return (
                 jsonify({"error": "Invalid price format"}),
                 status.HTTP_400_BAD_REQUEST,
             )
-    elif imageUrl:
-        app.logger.info("Find by imageUrl: %s", imageUrl)
-        products = Product.find_by_imageUrl(imageUrl)
-    else:
-        app.logger.info("Find all products")
-        products = Product.all()
 
-    # Serialize the results
+    products = query.all()
+
+    if not products:
+        return jsonify({"message": "No products found"}), status.HTTP_404_NOT_FOUND
+
     results = [product.serialize() for product in products]
     app.logger.info("Returning %d products", len(results))
     return jsonify(results), status.HTTP_200_OK
+
+
+@app.route("/products/<int:product_id>", methods=["GET"])
+def get_product(product_id):
+    """
+    Retrieve a single Product
+
+    This endpoint will return a Product based on its id
+    """
+    app.logger.info("Request to Retrieve a product with id [%s]", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
+
+    app.logger.info("Returning product: %s", product.name)
+    return jsonify(product.serialize()), status.HTTP_200_OK
 
 
 ######################################################################

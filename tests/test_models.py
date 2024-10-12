@@ -99,13 +99,28 @@ class TestCaseBase(TestCase):
         """It should List all products in the database"""
         products = Product.all()
         self.assertEqual(products, [])
-        # Create 5 Pets
+        # Create 5 Products
         for _ in range(5):
-            pet = ProductFactory()
-            pet.create()
+            product = ProductFactory()
+            product.create()
         # See if we get back 5 products
         products = Product.all()
         self.assertEqual(len(products), 5)
+
+    def test_read_a_product(self):
+        """It should Read a Product"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        # Fetch it back
+        found_product = Product.find(product.id)
+        self.assertEqual(found_product.id, product.id)
+        self.assertEqual(found_product.name, product.name)
+        self.assertEqual(found_product.description, product.description)
+        self.assertEqual(found_product.price, product.price)
+        self.assertEqual(found_product.imageUrl, product.imageUrl)
 
     ######################################################################
     #  T E S T   C A S E S   FOR   SERIALIZE/DESERIALIZE
