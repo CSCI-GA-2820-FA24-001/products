@@ -184,7 +184,7 @@ class TestCaseBase(TestCase):
     #  T E S T   C A S E S   FOR   UPDATE
     ######################################################################
 
-    def test_update_a_pet(self):
+    def test_update_a_product(self):
         """It should Update a Product"""
         product = ProductFactory()
         logging.debug(product)
@@ -224,7 +224,7 @@ class TestExceptionHandlers(TestCase):
         """It should catch a update exception"""
         exception_mock.side_effect = Exception()
         product = ProductFactory()
-        self.assertRaises(DataValidationError, product.create)
+        self.assertRaises(DataValidationError, product.update)
 
 
 # ######################################################################

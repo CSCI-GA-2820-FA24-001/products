@@ -104,10 +104,7 @@ def create_products():
     product.create()
     app.logger.info(f"Product {product.id}: {product.name} is saved!")
 
-    # TODO: uncomment this when read API is implemented!
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
-
-    location_url = "JUST A TEST FOR CREATE!"
+    location_url = url_for("get_products", product_id=product.id, _external=True)
 
     return (
         jsonify(product.serialize()),
@@ -158,7 +155,7 @@ def list_products():
 
 
 @app.route("/products/<int:product_id>", methods=["GET"])
-def get_product(product_id):
+def get_products(product_id):
     """
     Retrieve a single Product
 

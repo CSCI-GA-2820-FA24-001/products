@@ -31,8 +31,6 @@ class Product(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     imageUrl = db.Column(db.String(255), nullable=False)
 
-    # Todo: Place the rest of your schema here...
-
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
 
