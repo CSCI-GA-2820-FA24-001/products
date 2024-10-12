@@ -118,6 +118,18 @@ class TestCaseBase(TestCase):
         products = Product.all()
         self.assertEqual(len(products), 5)
 
+    def test_find_by_name(self):
+        """It should Find a Product by Name"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        name = products[0].name
+        count = len([product for product in products if product.name == name])
+        found = Product.find_by_name(name)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.name, name)
+
     def test_read_a_product(self):
         """It should Read a Product"""
         product = ProductFactory()
@@ -231,6 +243,13 @@ class TestExceptionHandlers(TestCase):
     """Product Model Exception Handlers"""
 
     @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        product = ProductFactory()
+        self.assertRaises(DataValidationError, product.create)
+
+    @patch("service.models.db.session.commit")
     def test_update_exception(self, exception_mock):
         """It should catch a update exception"""
         exception_mock.side_effect = Exception()
@@ -243,6 +262,7 @@ class TestExceptionHandlers(TestCase):
         exception_mock.side_effect = Exception()
         product = ProductFactory()
         self.assertRaises(DataValidationError, product.delete)
+
 
 # ######################################################################
 # #  Q U E R Y   T E S T   C A S E S
