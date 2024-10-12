@@ -116,6 +116,73 @@ class TestProductService(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 5)
 
+    def test_list_no_products_found(self):
+        """It should return a 404 error with 'No products found' when no products are available"""
+        Product.query.delete()
+        db.session.commit()
+        response = self.client.get("/products")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("No products found", data["message"])
+
+    # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+    def test_list_products_by_name(self):
+        """It should return products that match the name query"""
+        product1 = ProductFactory(name="Waterproof Tape")
+        product2 = ProductFactory(name="Heatproof Tape")
+        product1.create()
+        product2.create()
+
+        # Test partial name match
+        response = self.client.get(f"/products?name=Tape")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 2)
+        self.assertIn("Waterproof Tape", [p["name"] for p in data])
+        self.assertIn("Heatproof Tape", [p["name"] for p in data])
+
+    def test_list_products_by_price(self):
+        """It should return products within the price range"""
+        product1 = ProductFactory(price=50.0)
+        product2 = ProductFactory(price=60.0)
+        product1.create()
+        product2.create()
+
+        # Test price range filtering (55 should include both)
+        response = self.client.get(f"/products?price=55")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 2)  # Both products should be returned
+
+    def test_list_products_with_invalid_price(self):
+        """It should return a 400 error for an invalid price format"""
+        response = self.client.get(f"/products?price=invalid")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        data = response.get_json()
+        self.assertIn("Invalid price format", data["error"])
+
+    # ----------------------------------------------------------
+    # TEST READ FOR PRODUCT
+    # ----------------------------------------------------------
+    def test_get_product(self):
+        """It should Get a single Product"""
+        # get the id of a product
+        test_product = self._create_products(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_product.name)
+
+    def test_get_product_not_found(self):
+        """It should not Get a Product that's not found"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
+
     # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------

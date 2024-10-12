@@ -55,30 +55,9 @@ def health_check():
 ######################################################################
 
 
-@app.route("/products", methods=["GET"])
-def list_products():
-    """Returns all of the Products"""
-    app.logger.info("Request for product list")
-
-    products = []
-
-    # parse the query request
-    name = request.args.get("name")
-
-    # TODO: support more query methods and test them
-
-    # price = request.args.get("price")
-    # img_url = request.args.get("imageUrl")
-
-    print(request.args)
-
-    if name:
-        app.logger.info(f"Finding by name: {name}")
-        products = Product.find_by_name(name)
-
-    results = [product.serialize() for product in products]
-    app.logger.info(f"Find {len(results)} products")
-    return jsonify(results), status.HTTP_200_OK
+######################################################################
+# CREATE A NEW PRODUCT
+######################################################################
 
 
 @app.route("/products", methods=["POST"])
@@ -98,10 +77,7 @@ def create_products():
     product.create()
     app.logger.info(f"Product {product.id}: {product.name} is saved!")
 
-    # TODO: uncomment this when read API is implemented!
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
-
-    location_url = "JUST A TEST FOR CREATE!"
+    location_url = url_for("get_product", product_id=product.id, _external=True)
 
     return (
         jsonify(product.serialize()),
@@ -127,6 +103,66 @@ def delete_product(product_id):
 
     app.logger.info("Product with ID: %d deletion complete.", product_id)
     return {}, status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# LIST ALL PRODUCTS
+######################################################################
+@app.route("/products", methods=["GET"])
+def list_products():
+    """Returns Products based on name and price"""
+    app.logger.info("Request for product list")
+
+    name = request.args.get("name")
+    price = request.args.get("price")
+
+    query = Product.query
+
+    if name:
+        app.logger.info("Find by name (fuzzy match): %s", name)
+        query = query.filter(Product.name.like(f"%{name}%"))
+
+    if price:
+        try:
+            app.logger.info("Find by price range: %s", price)
+            price_value = float(price)
+            query = query.filter(
+                Product.price.between(price_value * 0.9, price_value * 1.1)
+            )
+        except ValueError:
+            app.logger.error("Invalid price format: %s", price)
+            return (
+                jsonify({"error": "Invalid price format"}),
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+    products = query.all()
+
+    if not products:
+        return jsonify({"message": "No products found"}), status.HTTP_404_NOT_FOUND
+
+    results = [product.serialize() for product in products]
+    app.logger.info("Returning %d products", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+@app.route("/products/<int:product_id>", methods=["GET"])
+def get_product(product_id):
+    """
+    Retrieve a single Product
+
+    This endpoint will return a Product based on its id
+    """
+    app.logger.info("Request to Retrieve a product with id [%s]", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
+
+    app.logger.info("Returning product: %s", product.name)
+    return jsonify(product.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
