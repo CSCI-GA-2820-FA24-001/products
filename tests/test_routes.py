@@ -201,7 +201,10 @@ class TestProductService(TestCase):
         new_product = response.get_json()
         self.assertEqual(new_product["name"], test_product.name)
         self.assertEqual(new_product["description"], test_product.description)
-        self.assertEqual(new_product["price"], str(round(test_product.price, 2)))
+        self.assertEqual(
+            str(round(float(new_product["price"]), 2)),
+            str(round(test_product.price, 2)),
+        )
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
 
         # Check that the location header was correct
