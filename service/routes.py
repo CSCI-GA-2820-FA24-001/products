@@ -113,6 +113,25 @@ def create_products():
     )
 
 
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    Delete a product
+
+    This endpoint will delete a product based on the ID specified in the path.
+    """
+    app.logger.info("Request to delete a product with ID [%s]", product_id)
+
+    # Find the product by ID
+    product = Product.find(product_id)
+    if product:
+        app.logger.info("Product with ID: %d found.", product.id)
+        product.delete()
+
+    app.logger.info("Product with ID: %d deletion complete.", product_id)
+    return {}, status.HTTP_204_NO_CONTENT
+
+
 ######################################################################
 # LIST ALL PRODUCTS
 ######################################################################
@@ -135,7 +154,7 @@ def list_products():
             app.logger.info("Find by price range: %s", price)
             price_value = float(price)
             query = query.filter(
-                Product.price.between(price_value - 5, price_value + 5)
+                Product.price.between(price_value * 0.9, price_value * 1.1)
             )
         except ValueError:
             app.logger.error("Invalid price format: %s", price)
