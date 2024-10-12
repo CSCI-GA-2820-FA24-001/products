@@ -111,7 +111,7 @@ def list_products():
             app.logger.info("Find by price range: %s", price)
             price_value = float(price)
             query = query.filter(
-                Product.price.between(price_value - 5, price_value + 5)
+                Product.price.between(price_value * 0.9, price_value * 1.1)
             )
         except ValueError:
             app.logger.error("Invalid price format: %s", price)
