@@ -104,7 +104,7 @@ def create_products():
     product.create()
     app.logger.info(f"Product {product.id}: {product.name} is saved!")
 
-    location_url = url_for("get_products", product_id=product.id, _external=True)
+    location_url = url_for("get_product", product_id=product.id, _external=True)
 
     return (
         jsonify(product.serialize()),
