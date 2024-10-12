@@ -1,31 +1,68 @@
-# NYU DevOps Project Template
+# NYU DevOps Products
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
+This is the development and utilization documentation for `products` squad. The products service represents the store items that the customer can buy. They have a unique product id, a name, description, price, and an imageURL for display.
+
+Team Members:\
+Shilong Dong, Yujia Zhu, Weilin Chen, Tiancheng Zhang, Arya Goyal
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project inherits basic code structure from [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd).
 
-## Automatic Setup
+- The `/service` folder contains our `models.py` file for our model and a `routes.py` file for our service.
+- The `/tests` folder has test case code for testing the model and the service separately.
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
+## Project Setup
 
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
+You need to clone this repo to your local dir and enter the project's directory. Then open it in VSCode, and make sure reopen it in Docker Container.
 
 ```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+git clone https://github.com/CSCI-GA-2820-FA24-001/products.git
+cd products
+code .
 ```
+
+## Usage
+
+### Service URLs
+
+We provide basic CRUD operations for the product service.
+`TODO`
+- Base URL: `/products`
+- Create a Product: 
+- Read a Product:
+- Update a Product:
+- Delete a Product:
+- List all Products:
+  
+### Test
+
+We follow the TDD manner during our development. If you want to test the project, you can follow the following commands.
+
+```bash
+cd products
+make test
+```
+
+Our test report is as follows:
+`TODO`
+
+### Run
+
+You can start the service using the following commands.
+
+```bash
+cd products
+make run
+```
+
+Then you are able to visit the homepage and utilize some services.
+
+For `CRUD`services, you should use the following RESTful requests.
+`TODO`
 
 ## Contents
 
@@ -57,6 +94,9 @@ tests/                     - test cases package
 ├── test_models.py         - test suite for business models
 └── test_routes.py         - test suite for service routes
 ```
+## 
+
+
 
 ## License
 
