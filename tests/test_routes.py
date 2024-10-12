@@ -22,10 +22,11 @@ TestProduct API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import db, Product
+from service.models import DataValidationError, db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -172,3 +173,28 @@ class TestProductService(TestCase):
 ######################################################################
 class TestSadPaths(TestCase):
     """Test REST Exception Handling"""
+
+    def setUp(self):
+        """Runs before each test"""
+        self.client = app.test_client()
+
+    ######################################################################
+    #  T E S T   M O C K S
+    ######################################################################
+    def test_unsupported_media_type(self):
+        """It should return 415 Unsupported Media Type"""
+        headers = {"Content-Type": "application/xml"}
+        response = self.client.post(
+            BASE_URL, data="<product></product>", headers=headers
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Unsupported media type")
+        self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    @patch("service.routes.Product.find_by_name")
+    def test_bad_request(self, bad_request_mock):
+        """It should return a Bad Request error from Find By Name"""
+        bad_request_mock.side_effect = DataValidationError()
+        response = self.client.get(BASE_URL, query_string="name=testproduct")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
