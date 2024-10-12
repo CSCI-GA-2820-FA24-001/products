@@ -31,8 +31,6 @@ class Product(db.Model):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     imageUrl = db.Column(db.String(255), nullable=False)
 
-    # Todo: Place the rest of your schema here...
-
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
 
@@ -52,9 +50,11 @@ class Product(db.Model):
 
     def update(self):
         """
-        Updates a ProductModel to the database
+        Updates a Product to the database
         """
         logger.info("Saving %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         try:
             db.session.commit()
         except Exception as e:
@@ -93,13 +93,16 @@ class Product(db.Model):
         try:
             self.name = data["name"]
             self.description = data["description"]
-            price = data["price"]
-            if not isinstance(price, float):
-                raise DataValidationError("Invalid type for price: must be a float")
+            try:
+                price = float(data["price"])
+            except ValueError as error:
+                raise DataValidationError(
+                    "Invalid type for price: must be a float"
+                ) from error
             self.price = price
             self.imageUrl = data["imageUrl"]
-        # except AttributeError as error:
-        #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
+            # except AttributeError as error:
+            #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Product: missing " + error.args[0]
