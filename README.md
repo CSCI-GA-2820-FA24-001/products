@@ -27,7 +27,7 @@ code .
 
 ## Usage
 
-### Service URLs
+### REST APIs
 
 We provide basic CRUD operations for the product service.
 `TODO`
