@@ -31,12 +31,11 @@ code .
 
 We provide basic CRUD operations for the product service.
 `TODO`
-- Base URL: `/products`
 - Create a Product: 
 - Read a Product:
 - Update a Product:
 - Delete a Product:
-- List all Products:
+- List all Products (Base URL): `/products`
   
 ### Test
 
@@ -77,7 +76,7 @@ cd products
 make run
 ```
 
-Then you are able to visit the homepage and utilize our services with prompts on the homepage.
+Then you are able to visit the homepage from `http://localhost:8080/` or `http://0.0.0.0:8080/`, and utilize our services with prompts on the homepage.
 
 ## Contents
 
