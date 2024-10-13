@@ -226,9 +226,7 @@ class TestProductService(TestCase):
         """It should Update an existing Product"""
         # create a product to update
         test_product = ProductFactory()
-        response = self.client.post(
-            BASE_URL, json=test_product.serialize(), content_type="application/json"
-        )
+        response = self.client.post(BASE_URL, json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # update the product
@@ -236,14 +234,27 @@ class TestProductService(TestCase):
         logging.debug(new_product)
         new_product["name"] = "new_name"
 
-        response = self.client.put(
-            f"{BASE_URL}/{new_product['id']}",
-            json=new_product,
-            content_type="application/json",
-        )
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "new_name")
+
+    def test_update_non_existing_product(self):
+        """It should handle updating a product that doesn't exist"""
+        # create a product and then delete it
+        test_product = ProductFactory()
+        response = self.client.post(
+            BASE_URL, json=test_product.serialize(), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = response.get_json()
+        product_id = product["id"]
+        response = self.client.delete(f"{BASE_URL}/{product_id}")
+
+        # then the product doesn't exist, try to update it with original id
+        product["name"] = "new_name"
+        response = self.client.put(f"{BASE_URL}/{product_id}", json=product)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
     # TEST DELETE
@@ -297,3 +308,8 @@ class TestSadPaths(TestCase):
         bad_request_mock.side_effect = DataValidationError()
         response = self.client.get(BASE_URL, query_string="name=testproduct")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_method_not_supported(self):
+        """It should return 405 Method Not Allowed"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
