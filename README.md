@@ -36,6 +36,8 @@ We provide basic CRUD operations for the product service.
 - Update a Product: `PUT` `/products/<product_id>`
 - Delete a Product: `DELETE` `/products/<product_id>`
 - List all Products (Base URL): `GET` `/products`
+
+When using List service, we can also specify `name` or `price` for fuzzy query, such as `GET /products?name=iPhone` and `GET /products?price=1088`. First request returns products whose name contains iPhone, and the second request returns those with price around 1088.
   
 ### Test
 
