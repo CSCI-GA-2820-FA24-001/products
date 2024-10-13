@@ -48,7 +48,25 @@ make test
 ```
 
 Our test report is as follows:
-`TODO`
+
+```bash
+---------- coverage: platform linux, python 3.11.10-final-0 ----------
+Name                               Stmts   Miss  Cover   Missing
+----------------------------------------------------------------
+service/__init__.py                   22      2    91%   50-51
+service/common/cli_commands.py         7      0   100%
+service/common/error_handlers.py      32      3    91%   91-93
+service/common/log_handlers.py        10      1    90%   35
+service/common/status.py              45      0   100%
+service/config.py                      7      0   100%
+service/models.py                     71      0   100%
+service/routes.py                     84      2    98%   217-218
+----------------------------------------------------------------
+TOTAL                                278      8    97%
+
+Required test coverage of 95% reached. Total coverage: 97.12%
+=================== 34 passed in 1.23s ===================
+```
 
 ### Run
 
@@ -59,10 +77,7 @@ cd products
 make run
 ```
 
-Then you are able to visit the homepage and utilize some services.
-
-For `CRUD`services, you should use the following RESTful requests.
-`TODO`
+Then you are able to visit the homepage and utilize our services with prompts on the homepage.
 
 ## Contents
 
