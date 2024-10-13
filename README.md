@@ -30,12 +30,12 @@ code .
 ### REST APIs
 
 We provide basic CRUD operations for the product service.
-`TODO`
-- Create a Product: 
-- Read a Product:
-- Update a Product:
-- Delete a Product:
-- List all Products (Base URL): `/products`
+
+- Create a Product: `POST` `/products` 
+- Read a Product: `GET` `/products/<product_id>`
+- Update a Product: `PUT` `/products/<product_id>`
+- Delete a Product: `DELETE` `/products/<product_id>`
+- List all Products (Base URL): `GET` `/products`
   
 ### Test
 
