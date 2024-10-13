@@ -22,11 +22,14 @@ TestProduct API Service Test Suite
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import patch
+
+# from unittest.mock import patch
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import DataValidationError, db, Product
+
+# from service.models import DataValidationError
+from service.models import db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -312,11 +315,10 @@ class TestSadPaths(TestCase):
         self.assertEqual(data["error"], "Unsupported media type")
         self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+
 #     @patch("service.routes.Product.find_by_name")
 #     def test_bad_request(self, bad_request_mock):
 #         """It should return a Bad Request error from Find By Name"""
 #         bad_request_mock.side_effect = DataValidationError()
 #         response = self.client.get(BASE_URL, query_string="name=testproduct")
 #         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
