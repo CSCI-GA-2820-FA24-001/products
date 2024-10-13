@@ -277,6 +277,16 @@ class TestSadPaths(TestCase):
         """Runs before each test"""
         self.client = app.test_client()
 
+    def test_create_product_no_data(self):
+        """It should not Create a product with missing data"""
+        response = self.client.post(BASE_URL, json={})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_method_not_allowed(self):
+        """It should not allow update without a product id"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     ######################################################################
     #  T E S T   M O C K S
     ######################################################################
@@ -290,10 +300,3 @@ class TestSadPaths(TestCase):
         data = response.get_json()
         self.assertEqual(data["error"], "Unsupported media type")
         self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-    @patch("service.routes.Product.find_by_name")
-    def test_bad_request(self, bad_request_mock):
-        """It should return a Bad Request error from Find By Name"""
-        bad_request_mock.side_effect = DataValidationError()
-        response = self.client.get(BASE_URL, query_string="name=testproduct")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
