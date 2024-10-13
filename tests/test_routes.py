@@ -136,7 +136,7 @@ class TestProductService(TestCase):
         product2.create()
 
         # Test partial name match
-        response = self.client.get(f"/products?name=Tape")
+        response = self.client.get("/products?name=Tape")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 2)
@@ -151,14 +151,14 @@ class TestProductService(TestCase):
         product2.create()
 
         # Test price range filtering (55 should include both)
-        response = self.client.get(f"/products?price=55")
+        response = self.client.get("/products?price=55")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 2)  # Both products should be returned
 
     def test_list_products_with_invalid_price(self):
         """It should return a 400 error for an invalid price format"""
-        response = self.client.get(f"/products?price=invalid")
+        response = self.client.get("/products?price=invalid")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         data = response.get_json()
         self.assertIn("Invalid price format", data["error"])
