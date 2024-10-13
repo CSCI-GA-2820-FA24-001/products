@@ -2,11 +2,12 @@
 Test Factory to make fake objects for testing
 """
 
-from datetime import date
+# from datetime import date
 from factory import Factory, Sequence, Faker
 from service.models import Product
-from factory.fuzzy import FuzzyInteger, FuzzyFloat
 
+# from factory.fuzzy import FuzzyInteger
+from factory.fuzzy import FuzzyFloat
 
 
 class ProductFactory(Factory):
@@ -23,5 +24,3 @@ class ProductFactory(Factory):
     price = FuzzyFloat(10.0, 50.0)
     description = Faker("text")
     imageUrl = Faker("image_url")
-
-    # Todo: Add your other attributes here...
