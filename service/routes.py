@@ -177,7 +177,7 @@ def list_products():
     products = query.all()
 
     if not products:
-        return jsonify({"message": "No products found"}), status.HTTP_404_NOT_FOUND
+        return jsonify([]), status.HTTP_200_OK
 
     results = [product.serialize() for product in products]
     app.logger.info("Returning %d products", len(results))

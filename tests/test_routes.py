@@ -120,13 +120,15 @@ class TestProductService(TestCase):
         self.assertEqual(len(data), 5)
 
     def test_list_no_products_found(self):
-        """It should return a 404 error with 'No products found' when no products are available"""
+        """It should return a 200 status and an empty list when no products are available"""
         Product.query.delete()
         db.session.commit()
+
         response = self.client.get("/products")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertIn("No products found", data["message"])
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 0)
 
     # ----------------------------------------------------------
     # TEST QUERY
