@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
+[![Build Status](https://github.com/VectorZYJ/products/actions/workflows/workflow.yml/badge.svg)](https://github.com/VectorZYJ/products/actions)
 
 This is the development and utilization documentation for `products` squad. The products service represents the store items that the customer can buy. They have a unique product id, a name, description, price, and an imageURL for display.
 
