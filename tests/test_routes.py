@@ -210,7 +210,7 @@ class TestProductService(TestCase):
             str(round(float(new_product["price"]), 2)),
             str(round(test_product.price, 2)),
         )
-        self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
+        self.assertEqual(new_product["image_url"], test_product.image_url)
         self.assertEqual(new_product["available"], test_product.available)
         # Check that the location header was correct
         response = self.client.get(location)
@@ -222,7 +222,7 @@ class TestProductService(TestCase):
             str(round(float(new_product["price"]), 2)),
             str(round(test_product.price, 2)),
         )
-        self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
+        self.assertEqual(new_product["image_url"], test_product.image_url)
         self.assertEqual(new_product["available"], test_product.available)
 
     # ----------------------------------------------------------

@@ -29,7 +29,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
-    imageUrl = db.Column(db.String(255), nullable=False)
+    image_url = db.Column(db.String(255), nullable=False)
     available = db.Column(db.Boolean(), nullable=False, default=False)
 
     def __repr__(self):
@@ -81,7 +81,7 @@ class Product(db.Model):
             "name": self.name,
             "description": self.description,
             "price": self.price,
-            "imageUrl": self.imageUrl,
+            "image_url": self.image_url,
             "available": self.available,
         }
 
@@ -101,7 +101,7 @@ class Product(db.Model):
                     "Invalid type for price: must be a float"
                 ) from error
             self.price = price
-            self.imageUrl = data["imageUrl"]
+            self.image_url = data["image_url"]
 
             # Add validation for available field
             if "available" in data:
