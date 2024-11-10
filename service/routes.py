@@ -156,6 +156,7 @@ def list_products():
 
     name = request.args.get("name")
     price = request.args.get("price")
+    available = request.args.get("available")
 
     query = Product.query
 
@@ -176,6 +177,11 @@ def list_products():
                 jsonify({"error": "Invalid price format"}),
                 status.HTTP_400_BAD_REQUEST,
             )
+    if available is not None:
+        # Convert the string to a boolean
+        is_available = available.lower() == "true"
+        app.logger.info("Find by availability: %s", is_available)
+        query = query.filter(Product.available == is_available)
 
     products = query.all()
 

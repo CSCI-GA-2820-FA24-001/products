@@ -27,6 +27,8 @@ from unittest import TestCase
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
+from decimal import Decimal
+from urllib.parse import quote_plus
 
 # from service.models import DataValidationError
 from service.models import db, Product
@@ -73,11 +75,11 @@ class TestProductService(TestCase):
     ############################################################
     # Utility function to bulk create products
     ############################################################
-    def _create_products(self, count: int = 1) -> list:
+    def _create_products(self, count: int = 1, available: bool = True) -> list:
         """Factory method to create products in bulk"""
         products = []
         for _ in range(count):
-            test_product = ProductFactory()
+            test_product = ProductFactory(available=available)
             response = self.client.post(BASE_URL, json=test_product.serialize())
             self.assertEqual(
                 response.status_code,
@@ -85,8 +87,14 @@ class TestProductService(TestCase):
                 "Could not create test product",
             )
             new_product = response.get_json()
+            self.assertEqual(
+                new_product["available"],
+                available,
+                "Product availability does not match the expected value.",
+            )
             test_product.id = new_product["id"]
             products.append(test_product)
+            db.session.commit()
         return products
 
     ######################################################################
@@ -284,6 +292,85 @@ class TestProductService(TestCase):
         self.assertEqual(len(response.data), 0)
 
     # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+
+    # some query unit tests fail after running make test many times
+    def test_query_by_name(self):
+        """It should Query Products by name"""
+        products = self._create_products(5)
+        test_name = products[0].name
+        name_count = len([product for product in products if product.name == test_name])
+        response = self.client.get(
+            BASE_URL, query_string=f"name={quote_plus(test_name)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), name_count)
+        # check the data just to be sure
+        for product in data:
+            self.assertEqual(product["name"], test_name)
+
+    def test_query_by_description(self):
+        """It should Query Products by description"""
+        test_description = "Test Description"
+        products = [ProductFactory(description=test_description) for _ in range(5)]
+        for product in products:
+            product.create()
+
+        response = self.client.get(
+            BASE_URL, query_string=f"description={quote_plus(test_description)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)  # Expect 5 products with the same description
+        for product in data:
+            self.assertEqual(product["description"], test_description)
+
+    def test_query_by_price(self):
+        """It should Query Products by price"""
+        test_price = Decimal("18.92")
+        products = [ProductFactory(price=test_price) for _ in range(5)]
+        for product in products:
+            product.create()
+
+        response = self.client.get(BASE_URL, query_string=f"price={test_price}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)  # Expect 5 products with the same price
+        for product in data:
+            self.assertEqual(round(Decimal(product["price"]), 2), test_price)
+
+    def test_query_by_availability(self):
+        """It should Query Products by availability"""
+        Product.query.delete()
+        db.session.commit()
+
+        # Create 4 available and 6 unavailable products
+        self._create_products(4, available=True)
+        self._create_products(6, available=False)
+
+        # Query for available products
+        response = self.client.get(BASE_URL, query_string="available=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 4)  # Expect 4 available products
+        for product in data:
+            self.assertTrue(product["available"])
+
+        # Query for unavailable products
+        response = self.client.get(BASE_URL, query_string="available=false")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 6)  # Expect 6 unavailable products
+        for product in data:
+            self.assertFalse(product["available"])
+
+        # Clean up after test
+        Product.query.delete()
+        db.session.commit()
+
+    # ----------------------------------------------------------
     # TEST ACTIONS
     # ----------------------------------------------------------
     def test_purchase_a_product(self):
@@ -303,10 +390,7 @@ class TestProductService(TestCase):
 
     def test_purchase_not_available(self):
         """It should not Purchase a Product that is not available"""
-        products = self._create_products(10)
-        unavailable_products = [
-            product for product in products if product.available is False
-        ]
+        unavailable_products = self._create_products(10, available=False)
         product = unavailable_products[0]
         response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)

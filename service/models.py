@@ -151,18 +151,16 @@ class Product(db.Model):
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
-    # @classmethod
-    # def find_by_availability(cls, available: bool = True) -> list:
-    #     """Returns all Products by their availability
+    @classmethod
+    def find_by_availability(cls, available: bool = True) -> list:
+        """Returns all Products by their availability
 
-    #     :param available: True for products that are available
-    #     :type available: str
+        :param available: True for products that are available
+        :type available: str
 
-    #     :return: a collection of Products that are available
-    #     :rtype: list
+        :return: a collection of Products that are available
+        :rtype: list
 
-    #     """
-    #     if not isinstance(available, bool):
-    #         raise TypeError("Invalid availability, must be of type boolean")
-    #     logger.info("Processing available query for %s ...", available)
-    #     return cls.query.filter(cls.available == available)
+        """
+        logger.info("Processing available query for %s ...", available)
+        return cls.query.filter(cls.available == available)
