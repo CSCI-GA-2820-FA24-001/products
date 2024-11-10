@@ -44,8 +44,8 @@ jobs:
               
       - name: Install dependencies
         run: |
-          python -m pip install poetry==1.7.1
-          poetry config virtualenvs.create false
+          python -m pip install poetry
+          poetry config virtualenvs.create true
           poetry lock --no-update
           poetry install
 
@@ -61,13 +61,10 @@ jobs:
 
       - name: Run unit tests with pytest
         run: |
-          pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95 --disable-warnings
+          poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95 --disable-warnings
         env:
           FLASK_APP: "wsgi:app"
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
-        
-      # Create a CODECOV_TOKEN in Settings->Secrets and variables->Actions
-      # and then uncomment the CodeCov action during hands-on lab
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3.1.4
