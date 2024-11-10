@@ -69,7 +69,11 @@ class TestCaseBase(TestCase):
     def test_create_a_product(self):
         """It should create a new product"""
         product = Product(
-            name="book", description="It's a book", price=15.2, imageUrl="www.test.com"
+            name="book",
+            description="It's a book",
+            price=15.2,
+            imageUrl="www.test.com",
+            available=True,
         )
         self.assertEqual(str(product), "<Product book id=[None]>")
         self.assertTrue(product is not None)
@@ -79,6 +83,7 @@ class TestCaseBase(TestCase):
         self.assertTrue(isinstance(product.price, float), True)
         self.assertEqual(str(product.price), "15.2")
         self.assertEqual(product.imageUrl, "www.test.com")
+        self.assertEqual(product.available, True)
 
     def test_create_and_add_a_product(self):
         """It should create a product and add it into db"""
@@ -94,6 +99,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(data.description, product.description)
         self.assertEqual(data.price, product.price)
         self.assertEqual(data.imageUrl, product.imageUrl)
+        self.assertEqual(data.available, product.available)
 
     def test_delete_product(self):
         """It should delete a Product"""
@@ -144,6 +150,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(found_product.description, product.description)
         self.assertEqual(found_product.price, product.price)
         self.assertEqual(found_product.imageUrl, product.imageUrl)
+        self.assertEqual(found_product.available, product.available)
 
     ######################################################################
     #  T E S T   C A S E S   FOR   SERIALIZE/DESERIALIZE
@@ -163,6 +170,8 @@ class TestCaseBase(TestCase):
         self.assertEqual(data["price"], product.price)
         self.assertIn("imageUrl", data)
         self.assertEqual(data["imageUrl"], product.imageUrl)
+        self.assertIn("available", data)
+        self.assertEqual(data["available"], product.available)
 
     def test_deserialize_a_product(self):
         """It should de-serialize a Product"""
@@ -171,14 +180,16 @@ class TestCaseBase(TestCase):
             "description": "A sample description",
             "price": 19.99,
             "imageUrl": "http://example.com/image.png",
+            "available": True,
         }
-        product = Product()  # Assuming 'Product' is the new class name instead of 'Pet'
+        product = Product()
         product.deserialize(data)
         self.assertIsNotNone(product)
         self.assertEqual(product.name, data["name"])
         self.assertEqual(product.description, data["description"])
         self.assertEqual(product.price, data["price"])
         self.assertEqual(product.imageUrl, data["imageUrl"])
+        self.assertEqual(product.available, data["available"])
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a Product with missing data"""
@@ -186,6 +197,14 @@ class TestCaseBase(TestCase):
             "name": "Sample Product",
             "price": 19.99,
         }  # Missing description and imageUrl
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_available(self):
+        """It should not deserialize a bad available attribute"""
+        test_product = ProductFactory()
+        data = test_product.serialize()
+        data["available"] = "not a boolean"
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 

@@ -209,6 +209,35 @@ def get_product(product_id):
 
 
 ######################################################################
+# PURCHASE A PRODUCT
+######################################################################
+@app.route("/products/<int:product_id>/purchase", methods=["PUT"])
+def purchase_product(product_id):
+    """Purchasing a Product makes it unavailable"""
+    app.logger.info("Request to purchase product with id: %d", product_id)
+
+    # Attempt to find the Product and abort if not found
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
+
+    # you can only purchase product that are available
+    if not product.available:
+        abort(
+            status.HTTP_409_CONFLICT,
+            f"Product with id '{product_id}' is not available.",
+        )
+
+    product.available = False
+    product.update()
+
+    app.logger.info("Product with ID: %d has been purchased.", product_id)
+    return product.serialize(), status.HTTP_200_OK
+
+
+######################################################################
 # Checks the ContentType of a request
 ######################################################################
 def check_content_type(content_type) -> None:
