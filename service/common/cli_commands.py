@@ -34,3 +34,11 @@ def db_create():
     db.drop_all()
     db.create_all()
     db.session.commit()
+
+
+@app.cli.command("reset-db")
+def reset_db():
+    """Drops all tables and recreates them."""
+    db.drop_all()
+    db.create_all()
+    print("Database has been reset.")
