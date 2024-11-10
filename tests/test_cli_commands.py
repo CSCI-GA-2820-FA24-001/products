@@ -26,7 +26,7 @@ from click.testing import CliRunner
 
 # pylint: disable=unused-import
 from wsgi import app  # noqa: F401
-from service.common.cli_commands import db_create  # noqa: E402
+from service.common.cli_commands import db_create, reset_db  # noqa: E402
 
 
 class TestFlaskCLI(TestCase):
@@ -42,3 +42,14 @@ class TestFlaskCLI(TestCase):
         with patch.dict(os.environ, {"FLASK_APP": "wsgi:app"}, clear=True):
             result = self.runner.invoke(db_create)
             self.assertEqual(result.exit_code, 0)
+
+    @patch("service.common.cli_commands.db")
+    def test_db_reset(self, db_mock):
+        """It should call the reset-db command"""
+        db_mock.drop_all = MagicMock()
+        db_mock.create_all = MagicMock()
+        with patch.dict(os.environ, {"FLASK_APP": "wsgi:app"}, clear=True):
+            result = self.runner.invoke(reset_db)
+            self.assertEqual(result.exit_code, 0)
+            db_mock.drop_all.assert_called_once()
+            db_mock.create_all.assert_called_once()
