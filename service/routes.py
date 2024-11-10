@@ -38,7 +38,13 @@ def index():
         jsonify(
             name="Product REST API Service",
             version="1.0",
-            path=url_for("list_products", _external=True),
+            services={
+                "Create a new product": "POST /products",
+                "Retrieve a product": "GET /products/<product_id>",
+                "Update a product": "PUT /products/<product_id>",
+                "Delete a product": "DELETE /products/<product_id>",
+                "List all products": "GET /products",
+            },
         ),
         status.HTTP_200_OK,
     )
@@ -51,10 +57,10 @@ def health_check():
 
 
 ######################################################################
-# UPDATE AN EXISTING PET
+# UPDATE AN EXISTING PRODUCT
 ######################################################################
 @app.route("/products/<int:product_id>", methods=["PUT"])
-def update_products(product_id):
+def update_product(product_id):
     """
     Update a Product
 
@@ -88,7 +94,7 @@ def update_products(product_id):
 
 
 @app.route("/products", methods=["POST"])
-def create_products():
+def create_product():
     """
     Create a Product
     This endpoint will create a Product based the data in the body that is posted
@@ -111,6 +117,11 @@ def create_products():
         status.HTTP_201_CREATED,
         {"Location": location_url},
     )
+
+
+######################################################################
+# DELETE A NEW PRODUCT
+######################################################################
 
 
 @app.route("/products/<int:product_id>", methods=["DELETE"])
@@ -166,11 +177,16 @@ def list_products():
     products = query.all()
 
     if not products:
-        return jsonify({"message": "No products found"}), status.HTTP_404_NOT_FOUND
+        return jsonify([]), status.HTTP_200_OK
 
     results = [product.serialize() for product in products]
     app.logger.info("Returning %d products", len(results))
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# RETRIEVE A PRODUCT
+######################################################################
 
 
 @app.route("/products/<int:product_id>", methods=["GET"])

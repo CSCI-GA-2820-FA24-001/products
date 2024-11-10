@@ -22,11 +22,14 @@ TestProduct API Service Test Suite
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import patch
+
+# from unittest.mock import patch
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from service.models import DataValidationError, db, Product
+
+# from service.models import DataValidationError
+from service.models import db, Product
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -117,13 +120,15 @@ class TestProductService(TestCase):
         self.assertEqual(len(data), 5)
 
     def test_list_no_products_found(self):
-        """It should return a 404 error with 'No products found' when no products are available"""
+        """It should return a 200 status and an empty list when no products are available"""
         Product.query.delete()
         db.session.commit()
+
         response = self.client.get("/products")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertIn("No products found", data["message"])
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 0)
 
     # ----------------------------------------------------------
     # TEST QUERY
@@ -136,7 +141,7 @@ class TestProductService(TestCase):
         product2.create()
 
         # Test partial name match
-        response = self.client.get(f"/products?name=Tape")
+        response = self.client.get("/products?name=Tape")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 2)
@@ -151,14 +156,14 @@ class TestProductService(TestCase):
         product2.create()
 
         # Test price range filtering (55 should include both)
-        response = self.client.get(f"/products?price=55")
+        response = self.client.get("/products?price=55")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 2)  # Both products should be returned
 
     def test_list_products_with_invalid_price(self):
         """It should return a 400 error for an invalid price format"""
-        response = self.client.get(f"/products?price=invalid")
+        response = self.client.get("/products?price=invalid")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         data = response.get_json()
         self.assertIn("Invalid price format", data["error"])
@@ -227,9 +232,7 @@ class TestProductService(TestCase):
         """It should Update an existing Product"""
         # create a product to update
         test_product = ProductFactory()
-        response = self.client.post(
-            BASE_URL, json=test_product.serialize(), content_type="application/json"
-        )
+        response = self.client.post(BASE_URL, json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # update the product
@@ -237,14 +240,27 @@ class TestProductService(TestCase):
         logging.debug(new_product)
         new_product["name"] = "new_name"
 
-        response = self.client.put(
-            f"{BASE_URL}/{new_product['id']}",
-            json=new_product,
-            content_type="application/json",
-        )
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "new_name")
+
+    def test_update_non_existing_product(self):
+        """It should handle updating a product that doesn't exist"""
+        # create a product and then delete it
+        test_product = ProductFactory()
+        response = self.client.post(
+            BASE_URL, json=test_product.serialize(), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = response.get_json()
+        product_id = product["id"]
+        response = self.client.delete(f"{BASE_URL}/{product_id}")
+
+        # then the product doesn't exist, try to update it with original id
+        product["name"] = "new_name"
+        response = self.client.put(f"{BASE_URL}/{product_id}", json=product)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
     # TEST DELETE
@@ -329,3 +345,11 @@ class TestSadPaths(TestCase):
         data = response.get_json()
         self.assertEqual(data["error"], "Unsupported media type")
         self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+
+#     @patch("service.routes.Product.find_by_name")
+#     def test_bad_request(self, bad_request_mock):
+#         """It should return a Bad Request error from Find By Name"""
+#         bad_request_mock.side_effect = DataValidationError()
+#         response = self.client.get(BASE_URL, query_string="name=testproduct")
+#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
