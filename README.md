@@ -34,13 +34,16 @@ code .
 
 We provide basic CRUD operations for the product service.
 
-- Create a Product: `POST` `/products` 
-- Read a Product: `GET` `/products/<product_id>`
-- Update a Product: `PUT` `/products/<product_id>`
-- Delete a Product: `DELETE` `/products/<product_id>`
-- List all Products (Base URL): `GET` `/products`
+- Create a product: `POST` `/products`
+- Read a product: `GET` `/products/<product_id>`
+- Update a product: `PUT` `/products/<product_id>`
+- Delete a product: `DELETE` `/products/<product_id>`
+- List all products : `GET` `/products`
+- Query products by name: `GET` `/products?name=<product_name>`
+- Query products by price: `GET` `/products?price=<product_price>`
+- Purchase a product: `PUT` `/products/<product_id>/purchase`
 
-When using List service, we can also specify `name` or `price` for fuzzy query, such as `GET /products?name=iPhone` and `GET /products?price=1088`. First request returns products whose name contains iPhone, and the second request returns those with price around 1088.
+When using Query service, we can specify `name` or `price` for fuzzy query, such as `GET /products?name=iPhone` and `GET /products?price=1088`. First request returns products whose name contains iPhone, and the second request returns those with price around 1088.
   
 ### Test
 

@@ -311,6 +311,12 @@ class TestProductService(TestCase):
         response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
+    def test_purchase_not_exist(self):
+        """It should not Purchase a Product that does not exist"""
+        product_id = -1
+        response = self.client.put(f"{BASE_URL}/{product_id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S
