@@ -206,7 +206,7 @@ class TestProductService(TestCase):
             str(round(test_product.price, 2)),
         )
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
-
+        self.assertEqual(new_product["available"], test_product.available)
         # Check that the location header was correct
         response = self.client.get(location)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -218,6 +218,7 @@ class TestProductService(TestCase):
             str(round(test_product.price, 2)),
         )
         self.assertEqual(new_product["imageUrl"], test_product.imageUrl)
+        self.assertEqual(new_product["available"], test_product.available)
 
     # ----------------------------------------------------------
     # TEST UPDATE
@@ -265,6 +266,34 @@ class TestProductService(TestCase):
         response = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
+
+    # ----------------------------------------------------------
+    # TEST ACTIONS
+    # ----------------------------------------------------------
+    def test_purchase_a_product(self):
+        """It should Purchase a Product"""
+        products = self._create_products(10)
+        available_products = [
+            product for product in products if product.available is True
+        ]
+        product = available_products[0]
+        response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{product.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["available"], False)
+
+    def test_purchase_not_available(self):
+        """It should not Purchase a Product that is not available"""
+        products = self._create_products(10)
+        unavailable_products = [
+            product for product in products if product.available is False
+        ]
+        product = unavailable_products[0]
+        response = self.client.put(f"{BASE_URL}/{product.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
 
 ######################################################################

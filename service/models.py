@@ -30,11 +30,12 @@ class Product(db.Model):
     description = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     imageUrl = db.Column(db.String(255), nullable=False)
+    available = db.Column(db.Boolean(), nullable=False, default=False)
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
 
-    def create(self):
+    def create(self) -> None:
         """
         Creates a ProductModel to the database
         """
@@ -48,7 +49,7 @@ class Product(db.Model):
             logger.error("Error creating record: %s", self)
             raise DataValidationError(e) from e
 
-    def update(self):
+    def update(self) -> None:
         """
         Updates a Product to the database
         """
@@ -62,7 +63,7 @@ class Product(db.Model):
             logger.error("Error updating record: %s", self)
             raise DataValidationError(e) from e
 
-    def delete(self):
+    def delete(self) -> None:
         """Removes a ProductModel from the data store"""
         logger.info("Deleting %s", self.name)
         try:
@@ -73,7 +74,7 @@ class Product(db.Model):
             logger.error("Error deleting record: %s", self)
             raise DataValidationError(e) from e
 
-    def serialize(self):
+    def serialize(self) -> dict:
         """Serializes a Product into a dictionary"""
         return {
             "id": self.id,
@@ -81,14 +82,14 @@ class Product(db.Model):
             "description": self.description,
             "price": self.price,
             "imageUrl": self.imageUrl,
+            "available": self.available,
         }
 
-    def deserialize(self, data):
+    def deserialize(self, data: dict):
         """
         Deserializes a Product from a dictionary
-
         Args:
-            data (dict): A dictionary containing the resource data
+            data (dict): A dictionary containing the Product data
         """
         try:
             self.name = data["name"]
@@ -101,8 +102,18 @@ class Product(db.Model):
                 ) from error
             self.price = price
             self.imageUrl = data["imageUrl"]
-            # except AttributeError as error:
-            #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
+
+            # Add validation for available field
+            if "available" in data:
+                if not isinstance(data["available"], bool):
+                    raise DataValidationError(
+                        "Invalid type for boolean [available]: "
+                        + str(type(data["available"]))
+                    )
+                self.available = data["available"]
+            else:
+                self.available = False  # Default value if not provided
+
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Product: missing " + error.args[0]
@@ -139,3 +150,19 @@ class Product(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    # @classmethod
+    # def find_by_availability(cls, available: bool = True) -> list:
+    #     """Returns all Products by their availability
+
+    #     :param available: True for products that are available
+    #     :type available: str
+
+    #     :return: a collection of Products that are available
+    #     :rtype: list
+
+    #     """
+    #     if not isinstance(available, bool):
+    #         raise TypeError("Invalid availability, must be of type boolean")
+    #     logger.info("Processing available query for %s ...", available)
+    #     return cls.query.filter(cls.available == available)
