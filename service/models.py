@@ -164,3 +164,9 @@ class Product(db.Model):
         """
         logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
+
+    @classmethod
+    def find_by_image_url(cls, image_url):
+        """Returns all Products with the given image URL"""
+        logger.info("Processing image URL query for %s ...", image_url)
+        return cls.query.filter(cls.image_url == image_url)
