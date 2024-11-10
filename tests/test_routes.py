@@ -19,18 +19,15 @@ TestProduct API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
+from decimal import Decimal
+from urllib.parse import quote_plus
 import os
 import logging
 from unittest import TestCase
 
-# from unittest.mock import patch
 from tests.factories import ProductFactory
 from wsgi import app
 from service.common import status
-from decimal import Decimal
-from urllib.parse import quote_plus
-
-# from service.models import DataValidationError
 from service.models import db, Product
 
 DATABASE_URI = os.getenv(
