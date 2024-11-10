@@ -313,8 +313,8 @@ class TestProductService(TestCase):
 
     def test_purchase_not_exist(self):
         """It should not Purchase a Product that does not exist"""
-        product_id = -1
-        response = self.client.put(f"{BASE_URL}/{product_id}/purchase")
+        id_not_exist = 2147483647
+        response = self.client.put(f"{BASE_URL}/{id_not_exist}/purchase")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -343,6 +343,9 @@ class TestSadPaths(TestCase):
     ######################################################################
     def test_unsupported_media_type(self):
         """It should return 415 Unsupported Media Type"""
+        response = self.client.post(BASE_URL, data="<product></product>")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
         headers = {"Content-Type": "application/xml"}
         response = self.client.post(
             BASE_URL, data="<product></product>", headers=headers

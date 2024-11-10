@@ -104,15 +104,12 @@ class Product(db.Model):
             self.image_url = data["image_url"]
 
             # Add validation for available field
-            if "available" in data:
-                if not isinstance(data["available"], bool):
-                    raise DataValidationError(
-                        "Invalid type for boolean [available]: "
-                        + str(type(data["available"]))
-                    )
-                self.available = data["available"]
-            else:
-                self.available = False  # Default value if not provided
+            if not isinstance(data["available"], bool):
+                raise DataValidationError(
+                    "Invalid type for boolean [available]: "
+                    + str(type(data["available"]))
+                )
+            self.available = data["available"]
 
         except KeyError as error:
             raise DataValidationError(
@@ -151,18 +148,18 @@ class Product(db.Model):
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
-    # @classmethod
-    # def find_by_availability(cls, available: bool = True) -> list:
-    #     """Returns all Products by their availability
+    @classmethod
+    def find_by_availability(cls, available: bool = True) -> list:
+        """Returns all Products by their availability
 
-    #     :param available: True for products that are available
-    #     :type available: str
+        :param available: True for products that are available
+        :type available: str
 
-    #     :return: a collection of Products that are available
-    #     :rtype: list
+        :return: a collection of Products that are available
+        :rtype: list
 
-    #     """
-    #     if not isinstance(available, bool):
-    #         raise TypeError("Invalid availability, must be of type boolean")
-    #     logger.info("Processing available query for %s ...", available)
-    #     return cls.query.filter(cls.available == available)
+        """
+        if not isinstance(available, bool):
+            raise TypeError("Invalid availability, must be of type boolean")
+        logger.info("Processing available query for %s ...", available)
+        return cls.query.filter(cls.available == available)

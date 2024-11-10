@@ -221,7 +221,7 @@ def purchase_product(product_id):
 
     # Attempt to find the Product and abort if not found
     product = Product.find(product_id)
-    if not product:
+    if product is None:
         abort(
             status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
         )
