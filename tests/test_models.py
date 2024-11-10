@@ -72,7 +72,7 @@ class TestCaseBase(TestCase):
             name="book",
             description="It's a book",
             price=15.2,
-            imageUrl="www.test.com",
+            image_url="www.test.com",
             available=True,
         )
         self.assertEqual(str(product), "<Product book id=[None]>")
@@ -82,7 +82,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(product.description, "It's a book")
         self.assertTrue(isinstance(product.price, float), True)
         self.assertEqual(str(product.price), "15.2")
-        self.assertEqual(product.imageUrl, "www.test.com")
+        self.assertEqual(product.image_url, "www.test.com")
         self.assertEqual(product.available, True)
 
     def test_create_and_add_a_product(self):
@@ -90,6 +90,7 @@ class TestCaseBase(TestCase):
         products = Product.all()
         self.assertEqual(products, [])
         product = ProductFactory()
+        print(product)
         product.create()
         self.assertIsNotNone(product.id)
         found = Product.all()
@@ -98,7 +99,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(data.name, product.name)
         self.assertEqual(data.description, product.description)
         self.assertEqual(data.price, product.price)
-        self.assertEqual(data.imageUrl, product.imageUrl)
+        self.assertEqual(data.image_url, product.image_url)
         self.assertEqual(data.available, product.available)
 
     def test_delete_product(self):
@@ -149,7 +150,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(found_product.name, product.name)
         self.assertEqual(found_product.description, product.description)
         self.assertEqual(found_product.price, product.price)
-        self.assertEqual(found_product.imageUrl, product.imageUrl)
+        self.assertEqual(found_product.image_url, product.image_url)
         self.assertEqual(found_product.available, product.available)
 
     ######################################################################
@@ -168,8 +169,8 @@ class TestCaseBase(TestCase):
         self.assertEqual(data["description"], product.description)
         self.assertIn("price", data)
         self.assertEqual(data["price"], product.price)
-        self.assertIn("imageUrl", data)
-        self.assertEqual(data["imageUrl"], product.imageUrl)
+        self.assertIn("image_url", data)
+        self.assertEqual(data["image_url"], product.image_url)
         self.assertIn("available", data)
         self.assertEqual(data["available"], product.available)
 
@@ -179,7 +180,7 @@ class TestCaseBase(TestCase):
             "name": "Sample Product",
             "description": "A sample description",
             "price": 19.99,
-            "imageUrl": "http://example.com/image.png",
+            "image_url": "http://example.com/image.png",
             "available": True,
         }
         product = Product()
@@ -188,7 +189,7 @@ class TestCaseBase(TestCase):
         self.assertEqual(product.name, data["name"])
         self.assertEqual(product.description, data["description"])
         self.assertEqual(product.price, data["price"])
-        self.assertEqual(product.imageUrl, data["imageUrl"])
+        self.assertEqual(product.image_url, data["image_url"])
         self.assertEqual(product.available, data["available"])
 
     def test_deserialize_missing_data(self):
@@ -196,7 +197,7 @@ class TestCaseBase(TestCase):
         data = {
             "name": "Sample Product",
             "price": 19.99,
-        }  # Missing description and imageUrl
+        }  # Missing description and image_url
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 
@@ -304,7 +305,7 @@ class TestExceptionHandlers(TestCase):
 #         self.assertEqual(product.name, products[1].name)
 #         self.assertEqual(product.description, products[1].description)
 #         self.assertEqual(product.price, products[1].price)
-#         self.assertEqual(product.imageUrl, products[1].imageUrl)
+#         self.assertEqual(product.image_url, products[1].image_url)
 
 #     def test_find_by_name(self):
 #         """It should Find a Product by Name"""
@@ -344,17 +345,17 @@ class TestExceptionHandlers(TestCase):
 #         for product in found:
 #             self.assertEqual(product.price, price)
 
-#     def test_find_by_imageUrl(self):
+#     def test_find_by_image_url(self):
 #         """It should Find Products by Image URL"""
 #         products = ProductFactory.create_batch(10)
 #         for product in products:
 #             product.create()
-#         imageUrl = products[0].imageUrl
-#         count = len([product for product in products if product.imageUrl == imageUrl])
-#         found = Product.find_by_imageUrl(imageUrl)
+#         image_url = products[0].image_url
+#         count = len([product for product in products if product.image_url == image_url])
+#         found = Product.find_by_image_url(image_url)
 #         self.assertEqual(found.count(), count)
 #         for product in found:
-#             self.assertEqual(product.imageUrl, imageUrl)
+#             self.assertEqual(product.image_url, image_url)
 
 #     def test_find_by_in_stock(self):
 #         """It should Find Products by In Stock"""
