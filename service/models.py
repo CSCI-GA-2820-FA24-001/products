@@ -163,3 +163,21 @@ class Product(db.Model):
             raise TypeError("Invalid availability, must be of type boolean")
         logger.info("Processing available query for %s ...", available)
         return cls.query.filter(cls.available == available)
+
+    @classmethod
+    def find_by_image_url(cls, image_url):
+        """Returns all Products with the given image URL"""
+        logger.info("Processing image URL query for %s ...", image_url)
+        return cls.query.filter(cls.image_url == image_url)
+
+    @classmethod
+    def find_by_description(cls, description):
+        """Returns all Products with the given image URL"""
+        logger.info("Processing image URL query for %s ...", description)
+        return cls.query.filter(cls.description == description)
+
+    @classmethod
+    def find_by_price(cls, price):
+        """Returns all Products with the given image URL"""
+        logger.info("Processing image URL query for %s ...", price)
+        return cls.query.filter(cls.price == price)

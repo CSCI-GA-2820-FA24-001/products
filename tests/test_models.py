@@ -337,3 +337,41 @@ class TestModelQueries(TestCaseBase):
             Product.find_by_availability("bad availability")
         except TypeError as error:
             self.assertRaises(TypeError, error)
+
+    def test_find_by_description(self):
+        """It should Find Products by Description"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        description = products[0].description
+        count = len(
+            [product for product in products if product.description == description]
+        )
+        found = Product.find_by_description(description)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.description, description)
+
+    def test_find_by_price(self):
+        """It should Find Products by Price"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        price = products[0].price
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
+
+    def test_find_by_image_url(self):
+        """It should Find Products by Image URL"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        image_url = products[0].image_url
+        count = len([product for product in products if product.image_url == image_url])
+        found = Product.find_by_image_url(image_url)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.image_url, image_url)
