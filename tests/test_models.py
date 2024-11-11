@@ -283,26 +283,77 @@ class TestExceptionHandlers(TestCase):
         product = ProductFactory()
         self.assertRaises(DataValidationError, product.delete)
 
+    # ######################################################################
+    # #  Q U E R Y   T E S T   C A S E S
+    # ######################################################################
 
-# ######################################################################
-# #  Q U E R Y   T E S T   C A S E S
-# ######################################################################
-# class TestModelQueries(TestCaseBase):
-#     """Product Model Query Tests"""
 
-#     def test_find_product(self):
-#         """It should Find a Product by ID"""
-#         products = ProductFactory.create_batch(5)
-#         for product in products:
-#             product.create()
-#         logging.debug(products)
-#         # make sure they got saved
-#         self.assertEqual(len(Product.all()), 5)
-#         # find the 2nd product in the list
-#         product = Product.find(products[1].id)
-#         self.assertIsNot(product, None)
-#         self.assertEqual(product.id, products[1].id)
-#         self.assertEqual(product.name, products[1].name)
-#         self.assertEqual(product.description, products[1].description)
-#         self.assertEqual(product.price, products[1].price)
-#         self.assertEqual(product.image_url, products[1].image_url)
+class TestModelQueries(TestCaseBase):
+    """Product Model Query Tests"""
+
+    def test_find_product(self):
+        """It should Find a Product by ID"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        logging.debug(products)
+        # make sure they got saved
+        self.assertEqual(len(Product.all()), 5)
+        # find the 2nd product in the list
+        product = Product.find(products[1].id)
+        self.assertIsNot(product, None)
+        self.assertEqual(product.id, products[1].id)
+        self.assertEqual(product.name, products[1].name)
+        self.assertEqual(product.description, products[1].description)
+        self.assertEqual(product.price, products[1].price)
+        self.assertEqual(product.image_url, products[1].image_url)
+
+    def test_find_by_name(self):
+        """It should Find a Product by Name"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        name = products[0].name
+        count = len([product for product in products if product.name == name])
+        found = Product.find_by_name(name)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.name, name)
+
+    def test_find_by_description(self):
+        """It should Find Products by Description"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        description = products[0].description
+        count = len(
+            [product for product in products if product.description == description]
+        )
+        found = Product.find_by_description(description)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.description, description)
+
+    def test_find_by_price(self):
+        """It should Find Products by Price"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        price = products[0].price
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
+
+    def test_find_by_image_url(self):
+        """It should Find Products by Image URL"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        image_url = products[0].image_url
+        count = len([product for product in products if product.image_url == image_url])
+        found = Product.find_by_image_url(image_url)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.image_url, image_url)
