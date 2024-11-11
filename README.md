@@ -51,7 +51,9 @@ We follow the TDD manner during our development. If you want to test the project
 
 ```bash
 cd products
+flask db-create
 make test
+make lint
 ```
 
 Our test report is as follows:
