@@ -50,7 +50,6 @@ When using Query service, we can specify `name` or `price` for fuzzy query, such
 We follow the TDD manner during our development. If you want to test the project, you can follow the following commands.
 
 ```bash
-cd products
 flask db-create
 make test
 make lint
@@ -63,18 +62,19 @@ Our test report is as follows:
 Name                               Stmts   Miss  Cover   Missing
 ----------------------------------------------------------------
 service/__init__.py                   22      2    91%   50-51
-service/common/cli_commands.py         7      0   100%
+service/common/cli_commands.py        12      0   100%
 service/common/error_handlers.py      32      3    91%   91-93
 service/common/log_handlers.py        10      1    90%   35
 service/common/status.py              45      0   100%
 service/config.py                      7      0   100%
-service/models.py                     71      0   100%
-service/routes.py                     84      2    98%   217-218
+service/models.py                     93      0   100%
+service/routes.py                     96      0   100%
 ----------------------------------------------------------------
-TOTAL                                278      8    97%
+TOTAL                                317      6    98%
 
-Required test coverage of 95% reached. Total coverage: 97.12%
-=================== 34 passed in 1.23s ===================
+Required test coverage of 95% reached. Total coverage: 98.11%
+
+===================================================== 59 passed in 1.86s ===
 ```
 
 ### Run
@@ -82,7 +82,6 @@ Required test coverage of 95% reached. Total coverage: 97.12%
 You can start the service using the following commands.
 
 ```bash
-cd products
 make run
 ```
 
