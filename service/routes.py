@@ -53,6 +53,9 @@ def index():
     )
 
 
+######################################################################
+# GET HEALTH CHECK
+######################################################################
 @app.route("/health", methods=["GET"])
 def health_check():
     """Let them know our heart is still beating"""

@@ -90,7 +90,7 @@ class TestProductService(TestCase):
         return products
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    #  T E S T   C A S E S
     ######################################################################
 
     def test_index(self):
