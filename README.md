@@ -87,6 +87,58 @@ make run
 
 Then you are able to visit the homepage from `http://localhost:8080/` or `http://0.0.0.0:8080/`, and utilize our services with prompts on the homepage.
 
+### Deployment
+
+Deployment of our `products` service can be done in following steps:
+
+1. Create dev cluster
+
+```shell
+make cluster
+```
+
+2. Build this project as a Docker image
+
+```shell
+docker build -t products:1.0 .
+```
+
+3. Create tag and push our image to K3d registry
+
+```shell
+docker tag products:1.0 cluster-registry:5000/products:1.0
+docker push cluster-registry:5000/products:1.0
+```
+
+4. Create and switch to a new Kubernetes Namespace
+
+```shell
+kubectl create namespace deployment
+kubectl config set-context --current --namespace deployment
+```
+
+5. Deploy our image with postgresql and products service
+
+```shell
+kubectl apply -f k8s/postgresql
+kubectl apply -f k8s
+```
+
+6. View deployed services and logs from a certain service, now we can access `http://localhost:8080` for our `product` service that is deployed on local cluster
+
+```shell
+kubectl get all
+kubectl get pods
+kubectl logs pod/<pod-name>
+```
+
+7. Remove all services from the namespace
+
+```shell
+kubectl delete -f k8s/
+kubectl delete -f k8s/postgresql
+```
+
 ## Contents
 
 The project contains the following:
