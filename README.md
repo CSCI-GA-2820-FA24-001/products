@@ -121,6 +121,11 @@ kubectl config set-context --current --namespace deployment
 
 ```shell
 kubectl apply -f k8s/postgresql
+```
+
+wait for few seconds until postgresql service is running
+
+```shell
 kubectl apply -f k8s
 ```
 
@@ -137,6 +142,7 @@ kubectl logs pod/<pod-name>
 ```shell
 kubectl delete -f k8s/
 kubectl delete -f k8s/postgresql
+make cluster-rm
 ```
 
 ## Contents
