@@ -120,28 +120,28 @@ kubectl config set-context --current --namespace deployment
 5. Deploy our image with postgresql and products service
 
 ```shell
-kubectl apply -f k8s/postgresql
+kubectl apply -f k8s -R
 ```
 
-wait for few seconds until postgresql service is running
-
-```shell
-kubectl apply -f k8s
-```
-
-6. View deployed services and logs from a certain service, now we can access `http://localhost:8080` for our `product` service that is deployed on local cluster
+wait for approximately 20 seconds until all services are running, using following command to track status
 
 ```shell
 kubectl get all
+```
+
+6. View logs from a service
+
+```shell
 kubectl get pods
 kubectl logs pod/<pod-name>
 ```
 
-7. Remove all services from the namespace
+Now we can access `http://localhost:8080` for our `product` service that is deployed on local cluster
+
+7. Remove all services from the namespace and remove cluster
 
 ```shell
-kubectl delete -f k8s/
-kubectl delete -f k8s/postgresql
+kubectl delete -f k8s -R
 make cluster-rm
 ```
 
