@@ -32,16 +32,18 @@ code .
 
 ### REST APIs
 
-We provide basic CRUD operations for the product service.
+We provide basic CRUD, List, Query and Purchase operations for our product service.
 
-- Create a product: `POST` `/products`
-- Read a product: `GET` `/products/<product_id>`
-- Update a product: `PUT` `/products/<product_id>`
-- Delete a product: `DELETE` `/products/<product_id>`
-- List all products : `GET` `/products`
-- Query products by name: `GET` `/products?name=<product_name>`
-- Query products by price: `GET` `/products?price=<product_price>`
-- Purchase a product: `PUT` `/products/<product_id>/purchase`
+| Operation | Method | Endpoint |
+| :-------: | :----: | :------: |
+| Create a product | `POST` | `/products` |
+| Read a product | `GET` | `/products/<product_id>` |
+| Update a product | `PUT` | `/products/<product_id>` |
+| Delete a product | `DELETE` | `/products/<product_id>` |
+| List all products | `GET` | `/products` |
+| Query products by name | `GET` | `/products?name=<product_name>` |
+| Query products by price | `GET` | `/products?price=<product_price>` |
+| Purchase a product | `PUT` | `/products/<product_id>/purchase` |
 
 When using Query service, we can specify `name` or `price` for fuzzy query, such as `GET /products?name=iPhone` and `GET /products?price=1088`. First request returns products whose name contains iPhone, and the second request returns those with price around 1088.
   
