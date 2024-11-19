@@ -95,10 +95,9 @@ class TestProductService(TestCase):
 
     def test_index(self):
         """It should call the home page"""
-        resp = self.client.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["name"], "Product REST API Service")
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(b"Product Demo REST API Service", response.data)
 
     def test_health(self):
         """It should be healthy"""
