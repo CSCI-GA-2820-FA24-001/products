@@ -34,23 +34,24 @@ from service.common import status  # HTTP Status Codes
 def index():
     """Root URL response"""
     app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Product REST API Service",
-            version="1.0",
-            services={
-                "Create a new product": "POST /products",
-                "Retrieve a product": "GET /products/<product_id>",
-                "Update a product": "PUT /products/<product_id>",
-                "Delete a product": "DELETE /products/<product_id>",
-                "List all products": "GET /products",
-                "Query products by name": "GET /products/name=<product_name>",
-                "Query products by price": "GET /products/price=<product_price>",
-                "Purchase a product": "PUT /products/<product_id>/purchase",
-            },
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
+    # return (
+    #     jsonify(
+    #         name="Product REST API Service",
+    #         version="1.0",
+    #         services={
+    #             "Create a new product": "POST /products",
+    #             "Retrieve a product": "GET /products/<product_id>",
+    #             "Update a product": "PUT /products/<product_id>",
+    #             "Delete a product": "DELETE /products/<product_id>",
+    #             "List all products": "GET /products",
+    #             "Query products by name": "GET /products/name=<product_name>",
+    #             "Query products by price": "GET /products/price=<product_price>",
+    #             "Purchase a product": "PUT /products/<product_id>/purchase",
+    #         },
+    #     ),
+    #     status.HTTP_200_OK,
+    # )
 
 
 ######################################################################
@@ -111,6 +112,7 @@ def create_product():
     product = Product()
 
     data = request.get_json()
+    print(data)
     app.logger.info(f"Deserializing data {data}")
     product.deserialize(data)
     product.create()
