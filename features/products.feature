@@ -3,6 +3,16 @@ Feature: The product store service back-end
     I need a RESTful catalog service
     So that I can keep track of all my products
 
+
+Background:
+    Given the following products
+        | name    | description        | price | available | image_url  |
+        | Pen     | Blue ink pen       | 1.20  | True      |            |
+        | Notebook| Spiral notebook    | 2.50  | False     |            |       
+        | fluffy  | lion               | 0.99  | True      |            |
+        | Mug     | Ceramic coffee mug | 5.00  | True      |            |
+
+
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Product" in the title
@@ -29,3 +39,26 @@ Scenario: Create a Product
     And I should see "Unknown" in the "Description" field
     And I should see "True" in the "Available" dropdown
     And I should see "3.75" in the "Price" field    
+
+
+Scenario: Update a Product
+    When I visit the "Home Page"
+    And I set the "Name" to "fluffy"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "fluffy" in the "Name" field
+    And I should see "lion" in the "Description" field
+    When I change "Description" to "kitty"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "kitty" in the "Description" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "kitty" in the results
+    And I should not see "lion" in the results    
