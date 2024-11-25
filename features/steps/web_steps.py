@@ -45,6 +45,7 @@ def step_impl(context):
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """Check the document title for a message"""
+    print(f"Actual page title: {context.driver.title}")
     assert message in context.driver.title
 
 
@@ -156,3 +157,13 @@ def step_impl(context, text_string, element_name):
         )
     )
     assert found
+
+
+@when('I change "{element_name}" to "{text_string}"')
+def step_impl(context, element_name, text_string):
+    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.clear()
+    element.send_keys(text_string)

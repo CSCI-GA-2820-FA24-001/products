@@ -241,6 +241,7 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
+            res = res.filter(product => product.available);
             $("#search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
