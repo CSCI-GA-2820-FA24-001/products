@@ -62,3 +62,12 @@ Scenario: Update a Product
     Then I should see the message "Success"
     And I should see "kitty" in the results
     And I should not see "lion" in the results    
+
+
+Scenario: List all products
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Mug" in the results
+    And I should see "Pen" in the results
+    And I should not see "Notebook" in the results    
