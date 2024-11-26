@@ -74,7 +74,7 @@ Scenario: List all products
 
 Scenario: Read a Product
     Given I visit the "Home Page"
-    And I set the "Id" to "1"
+    And I set the "Name" to "Pen"
     When I press the "Retrieve" button
     Then I should see the message "Success"
     And I should see "Pen" in the "Name" field
