@@ -167,3 +167,24 @@ def step_impl(context, element_name, text_string):
     )
     element.clear()
     element.send_keys(text_string)
+
+
+@then('the "Available" status of "{name}" should be "{status}"')
+def step_impl(context, name, status):
+    """Verify that the 'Available' status of a product is as expected."""
+    table = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.ID, "search_results"))
+    )
+    # Find all rows in the table
+    rows = table.find_elements(By.XPATH, ".//tr")
+    for row in rows:
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if len(cells) > 0:
+            product_name = cells[1].text.strip()
+            if product_name == name:
+                available_status = cells[5].text.strip()
+                assert (
+                    available_status == status
+                ), f'Expected Available status to be "{status}" but got "{available_status}"'
+                return
+    assert False, f'Product "{name}" not found in search results'

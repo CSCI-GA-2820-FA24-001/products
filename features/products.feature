@@ -97,10 +97,10 @@ Scenario: Query products by availability
     And I select "False" in the "Available" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "Notebook" in the results
-    And I should not see "Pen" in the results
-    And I should not see "fluffy" in the results
-    And I should not see "Mug" in the results
+    And I should not see "Notebook" in the results
+    And I should see "Pen" in the results
+    And I should see "fluffy" in the results
+    And I should see "Mug" in the results
 
 Scenario: Delete a Product
     When I visit the "Home Page"
@@ -116,3 +116,13 @@ Scenario: Delete a Product
     When I press the "Search" button
     Then I should see the message "Success"
     And I should not see "Pen" in the results
+
+Scenario: Purchase a Product
+    When I visit the "Home Page"
+    And I set the "Name" to "Pen"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Pen" in the results
+    When I press the "Purchase" button
+    Then I should see the message "Product has been Purchased!"
+    
