@@ -2,7 +2,11 @@
     "cSpell.words": [
         "sqlalchemy",
         "psycopg",
-        "testdb"
+        "testdb",
+        "api",
+        "restx",
+        "apidocs",
+        "gunicorn"
     ],
     "makefile.configureOnOpen": false
 }
