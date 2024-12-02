@@ -122,7 +122,8 @@ kubectl config set-context --current --namespace deployment
 5. Deploy our image with postgresql and products service
 
 ```shell
-kubectl apply -f k8s -R
+kubectl apply -f k8s/postgresql/
+kubectl apply -f k8s
 ```
 
 wait for approximately 20 seconds until all services are running, using following command to track status
