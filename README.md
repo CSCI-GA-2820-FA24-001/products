@@ -122,7 +122,7 @@ sudo bash -c "echo '127.0.0.1    cluster-registry' >> /etc/hosts"
 4. Create tag and push our image to K3d registry
 
 ```shell
-docker tag products:1.0 cluster-registry:5000/products:latest
+docker tag products:latest cluster-registry:5000/products:latest
 docker push cluster-registry:5000/products:latest
 ```
 

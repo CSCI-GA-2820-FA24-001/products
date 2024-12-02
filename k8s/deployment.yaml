@@ -5,7 +5,7 @@ metadata:
   labels:
     app: products
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -23,7 +23,6 @@ spec:
       containers:
       - name: products
         image: cluster-registry:5000/products:latest
-        # image: products
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -37,8 +36,8 @@ spec:
                 name: postgres-creds
                 key: database_uri
         readinessProbe:
-          initialDelaySeconds: 5
-          periodSeconds: 30
+          initialDelaySeconds: 10
+          periodSeconds: 60
           httpGet:
             path: /health
             port: 8080

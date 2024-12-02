@@ -6,9 +6,9 @@ spec:
   selector:
     app: products
   type: ClusterIP
-  internalTrafficPolicy: Local
+  internalTrafficPolicy: Cluster
   ports:
-    - name: http
+    - name: 8080-tcp
       protocol: TCP
       port: 8080
       targetPort: 8080
