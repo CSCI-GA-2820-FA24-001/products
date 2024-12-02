@@ -162,6 +162,30 @@ kubectl delete -f k8s -R
 make cluster-rm
 ```
 
+### Deployment on Red Hat OpenShift
+
+Login command within shell
+
+(See slides)
+
+Switch to project namespace
+
+```shell
+oc project vectorzyj-dev
+```
+
+Deploy PostgreSQL Database
+
+```shell
+oc apply -f k8s/postgresql/
+```
+
+Add Event Listener
+
+```shell
+oc apply -f .tekton/events/
+```
+
 ## Contents
 
 The project contains the following:
