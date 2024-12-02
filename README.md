@@ -183,7 +183,7 @@ oc apply -f k8s/postgresql/
 Add Event Listener
 
 ```shell
-occ apply -f .tekton/events/
+oc apply -f .tekton/events/
 ```
 
 ## Contents
