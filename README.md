@@ -102,14 +102,28 @@ make cluster
 2. Build this project as a Docker image
 
 ```shell
-docker build -t products:1.0 .
+docker build -t products:latest .
 ```
 
-3. Create tag and push our image to K3d registry
+3. Configure registry
+   
+Check if `cluster-registry` is configured in `/etc/hosts`:
 
 ```shell
-docker tag products:1.0 cluster-registry:5000/products:1.0
-docker push cluster-registry:5000/products:1.0
+cat /etc/hosts
+```
+
+If there is no entry for `cluster-registry`, add it by running:
+
+```shell
+sudo bash -c "echo '127.0.0.1    cluster-registry' >> /etc/hosts"
+```
+
+4. Create tag and push our image to K3d registry
+
+```shell
+docker tag products:1.0 cluster-registry:5000/products:latest
+docker push cluster-registry:5000/products:latest
 ```
 
 4. Create and switch to a new Kubernetes Namespace
