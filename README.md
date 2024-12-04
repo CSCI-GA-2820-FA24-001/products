@@ -186,6 +186,7 @@ Add Event Listener
 oc apply -f .tekton/events/
 ```
 
+Then click on `Trigger -> Deployment -> el-cd-listener`, in deployment details, set scaling to `1 pod`.
 ## Contents
 
 The project contains the following:
