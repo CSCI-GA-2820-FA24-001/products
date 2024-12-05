@@ -125,3 +125,20 @@ Scenario: Delete a Product
     When I press the "Search" button
     Then I should see the message "Success"
     And I should not see "Pen" in the results
+
+Scenario: Purchase a Product
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Pen"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Pen" in the results
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Purchase" button
+    Then I should see the message "Product has been Purchased!"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "Pen" in the results
