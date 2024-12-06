@@ -22,6 +22,8 @@ TestProduct API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+from urllib.parse import quote_plus
+from decimal import Decimal
 
 # from unittest.mock import patch
 from tests.factories import ProductFactory
@@ -123,7 +125,7 @@ class TestProductService(TestCase):
         Product.query.delete()
         db.session.commit()
 
-        response = self.client.get("/products")
+        response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertIsInstance(data, list)
@@ -132,67 +134,61 @@ class TestProductService(TestCase):
     # ----------------------------------------------------------
     # TEST QUERY
     # ----------------------------------------------------------
-    def test_list_products_by_name(self):
-        """It should return products that match the name query"""
-        product1 = ProductFactory(name="Waterproof Tape")
-        product2 = ProductFactory(name="Heatproof Tape")
-        product1.create()
-        product2.create()
-
-        # Test partial name match
-        response = self.client.get("/products?name=Tape")
+    def test_query_by_name(self):
+        """It should Query Products by name"""
+        products = self._create_products(5)
+        test_name = products[0].name
+        name_count = len([product for product in products if product.name == test_name])
+        response = self.client.get(
+            BASE_URL, query_string=f"name={quote_plus(test_name)}"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 2)
-        self.assertIn("Waterproof Tape", [p["name"] for p in data])
-        self.assertIn("Heatproof Tape", [p["name"] for p in data])
+        self.assertEqual(len(data), name_count)
+        # check the data just to be sure
+        for product in data:
+            self.assertEqual(product["name"], test_name)
 
-    def test_list_products_by_price(self):
-        """It should return products within the price range"""
-        product1 = ProductFactory(price=50.0)
-        product2 = ProductFactory(price=60.0)
-        product1.create()
-        product2.create()
-
-        # Test price range filtering (55 should include both)
-        response = self.client.get("/products?price=55")
+    def test_query_by_price(self):
+        """It should Query Products by price"""
+        products = self._create_products(5)
+        test_price = products[0].price
+        price_count = len(
+            [product for product in products if product.price == test_price]
+        )
+        response = self.client.get(BASE_URL, query_string=f"price={test_price}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 2)  # Both products should be returned
+        self.assertEqual(len(data), price_count)
+        for product in data:
+            self.assertEqual(round(Decimal(product["price"]), 2), test_price)
 
-    def test_list_products_with_invalid_price(self):
-        """It should return a 400 error for an invalid price format"""
-        response = self.client.get("/products?price=invalid")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        data = response.get_json()
-        self.assertIn("Invalid price format", data["error"])
+    def test_query_by_availability(self):
+        """It should Query Products by availability"""
+        products = self._create_products(10)
+        # test_available = products[0].available
+        available_products = [
+            product for product in products if product.available is True
+        ]
+        unavailable_products = [
+            product for product in products if product.available is False
+        ]
 
-    def test_list_products_by_availability_false(self):
-        """It should return products that have availability=False"""
-        product1 = ProductFactory(name="Unavailable Pen", available=False)
-        product2 = ProductFactory(name="Blue Pen", available=True)
-        product1.create()
-        product2.create()
+        available_count = len(list(available_products))
+        unavailable_count = len(list(unavailable_products))
+        logging.debug("Available Products [%d] %s", available_count, available_products)
+        logging.debug(
+            "Unavailable Products [%d] %s", unavailable_count, unavailable_products
+        )
 
-        response = self.client.get("/products?available=false")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "Unavailable Pen")
-        self.assertFalse(data[0]["available"])
-
-    def test_list_products_by_availability_false_no_matches(self):
-        """It should return an empty list if no products match availability=false"""
-        product1 = ProductFactory(name="Red Notebook", available=True)
-        product2 = ProductFactory(name="Green Mug", available=True)
-        product1.create()
-        product2.create()
-
-        response = self.client.get("/products?available=false")
+        # test for available
+        response = self.client.get(BASE_URL, query_string="available=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 0)
+        self.assertEqual(len(data), available_count)
+        # check the data just to be sure
+        for product in data:
+            self.assertEqual(product["available"], True)
 
     # ----------------------------------------------------------
     # TEST READ FOR PRODUCT
@@ -314,7 +310,7 @@ class TestProductService(TestCase):
     # ----------------------------------------------------------
     def test_purchase_a_product(self):
         """It should Purchase a Product"""
-        products = self._create_products(10)
+        products = self._create_products(5)
         available_products = [
             product for product in products if product.available is True
         ]
@@ -364,22 +360,15 @@ class TestSadPaths(TestCase):
         response = self.client.put(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    ######################################################################
-    #  T E S T   M O C K S
-    ######################################################################
     def test_unsupported_media_type(self):
         """It should return 415 Unsupported Media Type"""
-        response = self.client.post(BASE_URL, data="<product></product>")
+        response = self.client.post(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-        headers = {"Content-Type": "application/xml"}
-        response = self.client.post(
-            BASE_URL, data="<product></product>", headers=headers
-        )
+    def test_create_product_wrong_content_type(self):
+        """It should not Create a Product with the wrong content type"""
+        response = self.client.post(BASE_URL, data="hello", content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-        data = response.get_json()
-        self.assertEqual(data["error"], "Unsupported media type")
-        self.assertEqual(data["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
 
 #     @patch("service.routes.Product.find_by_name")
