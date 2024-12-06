@@ -57,6 +57,9 @@ jobs:
           poetry run flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
           # Run pylint on the service
           poetry run pylint service tests --max-line-length=127 --disable=too-many-instance-attributes
+      - name: Run black for auto-fixing
+        run: |
+          poetry run black service tests --check --diff || (poetry run black service tests)
 
       - name: Run unit tests with pytest
         run: |
