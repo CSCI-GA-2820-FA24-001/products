@@ -21,6 +21,7 @@ Scenario: The server is running
 
 Scenario: Create a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Happy"
     And I set the "Description" to "Unknown"
     And I select "True" in the "Available" dropdown
@@ -43,6 +44,7 @@ Scenario: Create a Product
 
 Scenario: Update a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "fluffy"
     And I press the "Search" button
     Then I should see the message "Success"
@@ -66,6 +68,7 @@ Scenario: Update a Product
 
 Scenario: List all products
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Mug" in the results
@@ -73,8 +76,15 @@ Scenario: List all products
     And I should not see "Notebook" in the results    
 
 Scenario: Read a Product
-    Given I visit the "Home Page"
-    And I set the "Id" to "1"
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Pen"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Pen" in the results
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
     When I press the "Retrieve" button
     Then I should see the message "Success"
     And I should see "Pen" in the "Name" field
