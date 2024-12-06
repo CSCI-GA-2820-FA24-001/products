@@ -1,15 +1,15 @@
 # NYU DevOps Products
 
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
+[![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
 [![codecov](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products/graph/badge.svg?token=JCE8OGIJZY)](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products)
-
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
 This is the development and utilization documentation for `products` squad. The products service represents the store items that the customer can buy. They have a unique product id, a name, description, price, and an imageURL for display.
 
 Team Members:\
-Shilong Dong, Yujia Zhu, Weilin Chen, Tiancheng Zhang, Arya Goyal
+Shilong Dong, Yujia Zhu, Weilin Cheng, Tiancheng Zhang, Arya Goyal
 
 ## Overview
 
@@ -49,7 +49,7 @@ When using Query service, we can specify `name` or `price` for fuzzy query, such
   
 ### Test
 
-We follow the TDD manner during our development. If you want to test the project, you can follow the following commands.
+We follow the TDD manner during our development. This repository includes both unit tests and integration tests. You can run following commands for Test Driven Development (TDD) and behave for Behavior Driven Development (BDD). Note that Behave requires the service under test to be running. If you want to test the project, you can follow the following commands.
 
 ```bash
 flask db-create
@@ -78,6 +78,18 @@ Required test coverage of 95% reached. Total coverage: 98.11%
 
 ===================================================== 59 passed in 1.86s ===
 ```
+Behavior Driven Development (BDD)
+For BDD, the tests require the service to be running, as these integration tests use Selenium to interact with a web page on a live server.
+Running Tests in Two Shells
+1. Start the server in a separate terminal:
+```bash
+honcho start
+```
+2. In your original terminal, run the BDD tests:
+```bash
+behave
+```
+As the tests execute, you will see the results displayed in the familiar red/green/refactor format, indicating the success or failure of each test.
 
 ### Run
 
