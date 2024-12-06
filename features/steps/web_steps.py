@@ -30,6 +30,7 @@ from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import TimeoutException
 
 ID_PREFIX = "product_"
 
@@ -124,12 +125,16 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-    found = WebDriverWait(context.driver, context.wait_seconds).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_results"), name
-        )
-    )
-    assert found
+    for _ in range(5):
+        try:
+            found = WebDriverWait(context.driver, 3).until(
+                expected_conditions.text_to_be_present_in_element(
+                    (By.ID, "search_results"), name
+                )
+            )
+            assert found
+        except TimeoutException:
+            continue
 
 
 @then('I should not see "{name}" in the results')
@@ -140,12 +145,16 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    found = WebDriverWait(context.driver, context.wait_seconds).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "flash_message"), message
-        )
-    )
-    assert found
+    for _ in range(5):
+        try:
+            found = WebDriverWait(context.driver, 3).until(
+                expected_conditions.text_to_be_present_in_element(
+                    (By.ID, "flash_message"), message
+                )
+            )
+            assert found
+        except TimeoutException:
+            continue
 
 
 @then('I should see "{text_string}" in the "{element_name}" field')

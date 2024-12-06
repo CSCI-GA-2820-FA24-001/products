@@ -1,15 +1,15 @@
 # NYU DevOps Products
 
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
+[![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
 [![codecov](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products/graph/badge.svg?token=JCE8OGIJZY)](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products)
-
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
 This is the development and utilization documentation for `products` squad. The products service represents the store items that the customer can buy. They have a unique product id, a name, description, price, and an imageURL for display.
 
 Team Members:\
-Shilong Dong, Yujia Zhu, Weilin Chen, Tiancheng Zhang, Arya Goyal
+Shilong Dong, Yujia Zhu, Weilin Cheng, Tiancheng Zhang, Arya Goyal
 
 ## Overview
 
@@ -49,7 +49,7 @@ When using Query service, we can specify `name` or `price` for fuzzy query, such
   
 ### Test
 
-We follow the TDD manner during our development. If you want to test the project, you can follow the following commands.
+We follow the TDD manner during our development. This repository includes both unit tests and integration tests. You can run following commands for Test Driven Development (TDD) and behave for Behavior Driven Development (BDD). Note that Behave requires the service under test to be running. If you want to test the project, you can follow the following commands.
 
 ```bash
 flask db-create
@@ -78,6 +78,18 @@ Required test coverage of 95% reached. Total coverage: 98.11%
 
 ===================================================== 59 passed in 1.86s ===
 ```
+Behavior Driven Development (BDD)
+For BDD, the tests require the service to be running, as these integration tests use Selenium to interact with a web page on a live server.
+Running Tests in Two Shells
+1. Start the server in a separate terminal:
+```bash
+honcho start
+```
+2. In your original terminal, run the BDD tests:
+```bash
+behave
+```
+As the tests execute, you will see the results displayed in the familiar red/green/refactor format, indicating the success or failure of each test.
 
 ### Run
 
@@ -102,27 +114,42 @@ make cluster
 2. Build this project as a Docker image
 
 ```shell
-docker build -t products:1.0 .
+docker build -t products:latest .
 ```
 
-3. Create tag and push our image to K3d registry
+3. Configure registry
+   
+Check if `cluster-registry` is configured in `/etc/hosts`:
 
 ```shell
-docker tag products:1.0 cluster-registry:5000/products:1.0
-docker push cluster-registry:5000/products:1.0
+cat /etc/hosts
 ```
 
-4. Create and switch to a new Kubernetes Namespace
+If there is no entry for `cluster-registry`, add it by running:
+
+```shell
+sudo bash -c "echo '127.0.0.1    cluster-registry' >> /etc/hosts"
+```
+
+4. Create tag and push our image to K3d registry
+
+```shell
+docker tag products:latest cluster-registry:5000/products:latest
+docker push cluster-registry:5000/products:latest
+```
+
+5. Create and switch to a new Kubernetes Namespace
 
 ```shell
 kubectl create namespace deployment
 kubectl config set-context --current --namespace deployment
 ```
 
-5. Deploy our image with postgresql and products service
+6. Deploy our image with postgresql and products service
 
 ```shell
-kubectl apply -f k8s -R
+kubectl apply -f k8s/postgresql/
+kubectl apply -f k8s
 ```
 
 wait for approximately 20 seconds until all services are running, using following command to track status
@@ -131,7 +158,7 @@ wait for approximately 20 seconds until all services are running, using followin
 kubectl get all
 ```
 
-6. View logs from a service
+7. View logs from a service
 
 ```shell
 kubectl get pods
@@ -140,13 +167,38 @@ kubectl logs pod/<pod-name>
 
 Now we can access `http://localhost:8080` for our `product` service that is deployed on local cluster
 
-7. Remove all services from the namespace and remove cluster
+8. Remove all services from the namespace and remove cluster
 
 ```shell
 kubectl delete -f k8s -R
 make cluster-rm
 ```
 
+### Deployment on Red Hat OpenShift
+
+Login command within shell
+
+(See slides)
+
+Switch to project namespace
+
+```shell
+oc project vectorzyj-dev
+```
+
+Deploy PostgreSQL Database
+
+```shell
+oc apply -f k8s/postgresql/
+```
+
+Add Event Listener
+
+```shell
+oc apply -f .tekton/events/
+```
+
+Then click on `Trigger -> Deployment -> el-cd-listener`, in deployment details, set scaling to `1 pod`.
 ## Contents
 
 The project contains the following:
