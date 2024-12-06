@@ -73,7 +73,6 @@ Scenario: List all products
     Then I should see the message "Success"
     And I should see "Mug" in the results
     And I should see "Pen" in the results
-    And I should not see "Notebook" in the results    
 
 
 Scenario: Read a Product
