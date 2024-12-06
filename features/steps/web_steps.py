@@ -32,7 +32,6 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import TimeoutException
 
-
 ID_PREFIX = "product_"
 
 

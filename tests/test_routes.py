@@ -167,6 +167,33 @@ class TestProductService(TestCase):
         data = response.get_json()
         self.assertIn("Invalid price format", data["error"])
 
+    def test_list_products_by_availability_false(self):
+        """It should return products that have availability=False"""
+        product1 = ProductFactory(name="Unavailable Pen", available=False)
+        product2 = ProductFactory(name="Blue Pen", available=True)
+        product1.create()
+        product2.create()
+
+        response = self.client.get("/products?available=false")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], "Unavailable Pen")
+        self.assertFalse(data[0]["available"])
+
+    def test_list_products_by_availability_false_no_matches(self):
+        """It should return an empty list if no products match availability=false"""
+        product1 = ProductFactory(name="Red Notebook", available=True)
+        product2 = ProductFactory(name="Green Mug", available=True)
+        product1.create()
+        product2.create()
+
+        response = self.client.get("/products?available=false")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 0)
+
     # ----------------------------------------------------------
     # TEST READ FOR PRODUCT
     # ----------------------------------------------------------

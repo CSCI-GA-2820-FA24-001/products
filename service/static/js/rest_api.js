@@ -216,6 +216,8 @@ $(function () {
 
         let name = $("#product_name").val();
         let price = $("#product_price").val();
+        let availability = $("#product_available").val();
+
 
         let queryString = ""
 
@@ -229,6 +231,12 @@ $(function () {
                 queryString += 'price=' + price
             }
         }
+        if (availability) {
+            if (queryString.length > 0) {
+                queryString += '&';
+            }
+            queryString += 'available=' + availability;
+        }
 
         $("#flash_message").empty();
 
@@ -241,7 +249,14 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            res = res.filter(product => product.available);
+            // res = res.filter(product => product.available);
+            console.log(res)
+            if (availability === "true") {
+                res = res.filter(product => product.available === true);
+            } else if (availability === "false") {
+                res = res.filter(product => product.available === false);
+            } 
+
             $("#search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
