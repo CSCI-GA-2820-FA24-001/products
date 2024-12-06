@@ -161,6 +161,18 @@ def list_products():
 
     name = request.args.get("name")
     price = request.args.get("price")
+    availability = request.args.get("available")
+    app.logger.info(f"{request}")
+
+    if availability == "false":
+        products = Product.find_by_availability(False)
+        if not products:
+            return jsonify([]), status.HTTP_200_OK
+
+        results = [product.serialize() for product in products]
+        app.logger.info("Returning %d products", len(results))
+        # app.logger.info(results)
+        return jsonify(results), status.HTTP_200_OK
 
     query = Product.query
 
