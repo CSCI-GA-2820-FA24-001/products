@@ -6,6 +6,7 @@ All of the models are stored in this module
 
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from decimal import Decimal
 
 logger = logging.getLogger("flask.app")
 
@@ -28,7 +29,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255), nullable=False)
-    price = db.Column(db.Numeric(10, 2), nullable=False)
+    price = db.Column(db.Numeric(scale=2), nullable=False)
     image_url = db.Column(db.String(255), nullable=False)
     available = db.Column(db.Boolean(), nullable=False, default=False)
 
@@ -80,7 +81,7 @@ class Product(db.Model):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "price": self.price,
+            "price": str(self.price),
             "image_url": self.image_url,
             "available": self.available,
         }
@@ -94,13 +95,7 @@ class Product(db.Model):
         try:
             self.name = data["name"]
             self.description = data["description"]
-            try:
-                price = float(data["price"])
-            except ValueError as error:
-                raise DataValidationError(
-                    "Invalid type for price: must be a float"
-                ) from error
-            self.price = price
+            self.price = round(Decimal(data["price"]), 2)
             self.image_url = data["image_url"]
 
             # Add validation for available field
