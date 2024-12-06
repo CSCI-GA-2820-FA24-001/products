@@ -21,10 +21,14 @@ Test cases for Product Model
 # pylint: disable=duplicate-code
 import os
 import logging
-from unittest import TestCase
 from decimal import Decimal
+from unittest import TestCase
 from unittest.mock import patch
+
+# Third-party imports
 from wsgi import app
+
+# Local application imports
 from service.models import Product, DataValidationError, db
 from .factories import ProductFactory
 
