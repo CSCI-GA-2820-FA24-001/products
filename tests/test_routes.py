@@ -152,6 +152,8 @@ class TestProductService(TestCase):
     def test_query_by_price(self):
         """It should Query Products by price"""
         products = self._create_products(5)
+        for product in products:
+            product.price = round(Decimal(product.price), 2)
         test_price = products[0].price
         price_count = len(
             [product for product in products if product.price == test_price]

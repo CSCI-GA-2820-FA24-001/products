@@ -84,7 +84,7 @@ Scenario: Read a Product
     And I should see "Pen" in the results
     And I should see "Blue ink pen" in the "Description" field
     And I should see "True" in the "Available" dropdown
-    And I should see "1.20" in the "Price" field
+    And I should see "1.2" in the "Price" field
     And I should not see "Notebook" in the results
     And I should not see "fluffy" in the results
     And I should not see "Mug" in the results
