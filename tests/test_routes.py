@@ -149,6 +149,22 @@ class TestProductService(TestCase):
         for product in data:
             self.assertEqual(product["name"], test_name)
 
+    def test_query_by_description(self):
+        """It should Query Products by description"""
+        products = self._create_products(5)
+        test_description = products[0].description
+        description_count = len(
+            [product for product in products if product.description == test_description]
+        )
+        response = self.client.get(
+            BASE_URL, query_string=f"description={quote_plus(test_description)}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), description_count)
+        for product in data:
+            self.assertEqual(product["description"], test_description)
+
     def test_query_by_price(self):
         """It should Query Products by price"""
         products = self._create_products(5)
