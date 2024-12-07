@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
+[![Lint Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/lint.yml)
 [![codecov](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products/graph/badge.svg?token=JCE8OGIJZY)](https://codecov.io/gh/CSCI-GA-2820-FA24-001/products)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
