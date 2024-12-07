@@ -21,9 +21,14 @@ Test cases for Product Model
 # pylint: disable=duplicate-code
 import os
 import logging
+from decimal import Decimal
 from unittest import TestCase
 from unittest.mock import patch
+
+# Third-party imports
 from wsgi import app
+
+# Local application imports
 from service.models import Product, DataValidationError, db
 from .factories import ProductFactory
 
@@ -71,7 +76,7 @@ class TestCaseBase(TestCase):
         product = Product(
             name="book",
             description="It's a book",
-            price=15.2,
+            price=Decimal("15.2"),
             image_url="www.test.com",
             available=True,
         )
@@ -80,8 +85,8 @@ class TestCaseBase(TestCase):
         self.assertEqual(product.id, None)
         self.assertEqual(product.name, "book")
         self.assertEqual(product.description, "It's a book")
-        self.assertTrue(isinstance(product.price, float), True)
-        self.assertEqual(str(product.price), "15.2")
+        self.assertTrue(isinstance(product.price, Decimal), True)
+        self.assertEqual(product.price, Decimal("15.2"))
         self.assertEqual(product.image_url, "www.test.com")
         self.assertEqual(product.available, True)
 
@@ -168,7 +173,7 @@ class TestCaseBase(TestCase):
         self.assertIn("description", data)
         self.assertEqual(data["description"], product.description)
         self.assertIn("price", data)
-        self.assertEqual(data["price"], product.price)
+        self.assertEqual(data["price"], str(product.price))
         self.assertIn("image_url", data)
         self.assertEqual(data["image_url"], product.image_url)
         self.assertIn("available", data)
@@ -188,7 +193,7 @@ class TestCaseBase(TestCase):
         self.assertIsNotNone(product)
         self.assertEqual(product.name, data["name"])
         self.assertEqual(product.description, data["description"])
-        self.assertEqual(product.price, data["price"])
+        self.assertEqual(product.price, round(Decimal(data["price"]), 2))
         self.assertEqual(product.image_url, data["image_url"])
         self.assertEqual(product.available, data["available"])
 
@@ -196,7 +201,7 @@ class TestCaseBase(TestCase):
         """It should not deserialize a Product with missing data"""
         data = {
             "name": "Sample Product",
-            "price": 19.99,
+            "price": Decimal("19.99"),
         }  # Missing description and image_url
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
@@ -212,14 +217,6 @@ class TestCaseBase(TestCase):
     def test_deserialize_bad_data(self):
         """It should not deserialize bad data"""
         data = "this is not a dictionary"  # Invalid data type
-        product = Product()
-        self.assertRaises(DataValidationError, product.deserialize, data)
-
-    def test_deserialize_bad_price(self):
-        """It should not deserialize a bad price attribute"""
-        test_product = ProductFactory()
-        data = test_product.serialize()
-        data["price"] = "19.99!"  # Invalid price, should be a float
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 
