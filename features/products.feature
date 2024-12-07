@@ -139,7 +139,6 @@ Scenario: Delete a Product
 
 Scenario: Query products by availability
     When I visit the "Home Page"
-    And I press the "Clear" button
     And I select "False" in the "Available" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
