@@ -1,4 +1,4 @@
-# NYU DevOps Products
+# NYU DevOps Products (Updated)
 
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/ci.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
 [![Build Status](https://github.com/CSCI-GA-2820-FA24-001/products/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA24-001/products/actions)
